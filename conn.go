@@ -83,7 +83,7 @@ func handleConn(conn net.Conn) {
 	close(kvSource)
 	wg.Wait()
 
-	log.Print("sync stats: ", syncStats)
+	log.Printf("sync stats: %+v", syncStats)
 
 	if syncErr != nil {
 		enc.Encode(SyncResult{false})
