@@ -1,0 +1,29 @@
+# github.com/DataDog/zstd v1.3.5
+github.com/DataDog/zstd
+# github.com/Shopify/sarama v1.20.1
+github.com/Shopify/sarama
+# github.com/boltdb/bolt v1.3.1
+github.com/boltdb/bolt
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
+# github.com/eapache/go-resiliency v1.1.0
+github.com/eapache/go-resiliency/breaker
+# github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21
+github.com/eapache/go-xerial-snappy
+# github.com/eapache/queue v1.1.0
+github.com/eapache/queue
+# github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
+github.com/golang/glog
+# github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
+github.com/golang/snappy
+# github.com/mcluseau/go-diff v0.0.0-20170912074617-100286016ffb
+github.com/mcluseau/go-diff
+# github.com/mcluseau/kafka-sync v0.0.0-20180212005405-9c9d18e48b85
+github.com/mcluseau/kafka-sync
+# github.com/pierrec/lz4 v2.0.5+incompatible
+github.com/pierrec/lz4
+github.com/pierrec/lz4/internal/xxh32
+# github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a
+github.com/rcrowley/go-metrics
+# golang.org/x/sys v0.0.0-20190214214411-e77772198cdc
+golang.org/x/sys/unix
