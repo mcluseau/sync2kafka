@@ -1,8 +1,9 @@
 package kafkasync
 
 import (
-	"github.com/golang/glog"
 	"time"
+
+	"github.com/golang/glog"
 )
 
 type Stats struct {
@@ -25,6 +26,16 @@ type Stats struct {
 	ReadTopicDuration time.Duration
 	SyncDuration      time.Duration
 	TotalDuration     time.Duration
+
+	startTime time.Time
+}
+
+func NewStats() *Stats {
+	return &Stats{startTime: time.Now()}
+}
+
+func (stats *Stats) Elapsed() time.Duration {
+	return time.Since(stats.startTime)
 }
 
 func (stats *Stats) Log() {

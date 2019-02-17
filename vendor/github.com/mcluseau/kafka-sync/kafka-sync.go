@@ -2,6 +2,7 @@ package kafkasync
 
 import (
 	"bytes"
+	"fmt"
 	"sync"
 	"time"
 
@@ -34,18 +35,22 @@ func New(topic string) Syncer {
 
 type KeyValue = diff.KeyValue
 
-// Synchronize an key-indexed data source with a topic.
+// Sync synchronize a key-indexed data source with a topic.
 //
 // The kvSource channel provides values in the reference store. It MUST NOT produce duplicate keys.
-func (s Syncer) Sync(kafka sarama.Client, kvSource <-chan KeyValue) (stats *Stats, err error) {
-	stats = &Stats{}
+func (s Syncer) Sync(kafka sarama.Client, kvSource <-chan KeyValue, cancel <-chan bool) (stats *Stats, err error) {
+	return s.SyncWithIndex(kafka, kvSource, diff.NewIndex(false), cancel)
+}
 
-	startTime := time.Now()
+// SyncWithIndex synchronize a data source with a topic, using the given index.
+//
+// The kvSource channel provides values in the reference store. It MUST NOT produce duplicate keys.
+func (s Syncer) SyncWithIndex(kafka sarama.Client, kvSource <-chan KeyValue, topicIndex diff.Index, cancel <-chan bool) (stats *Stats, err error) {
+	stats = NewStats()
 
 	// Read the topic
 	glog.Info("Reading topic ", s.Topic, ", partition ", s.Partition)
 
-	topicIndex := diff.NewIndex(false)
 	msgCount, err := s.IndexTopic(kafka, topicIndex)
 	if err != nil {
 		return
@@ -54,7 +59,12 @@ func (s Syncer) Sync(kafka sarama.Client, kvSource <-chan KeyValue) (stats *Stat
 	stats.MessagesInTopic = msgCount
 	glog.Info("Read ", msgCount, " messages from topic.")
 
-	stats.ReadTopicDuration = time.Since(startTime)
+	stats.ReadTopicDuration = stats.Elapsed()
+
+	return s.SyncWithPrepopulatedIndex(kafka, kvSource, topicIndex, cancel)
+}
+
+func (s Syncer) SyncWithPrepopulatedIndex(kafka sarama.Client, kvSource <-chan KeyValue, topicIndex diff.Index, cancel <-chan bool) (stats *Stats, err error) {
 
 	// Prepare producer
 	send, finish := s.SetupProducer(kafka, stats)
@@ -64,17 +74,16 @@ func (s Syncer) Sync(kafka sarama.Client, kvSource <-chan KeyValue) (stats *Stat
 
 	changes := make(chan diff.Change, 10)
 	go func() {
-		diff.DiffStreamIndex(kvSource, topicIndex, changes)
+		diff.DiffStreamIndex(kvSource, topicIndex, changes, cancel)
 		close(changes)
 		glog.V(1).Infof("Sync to %s partition %d finished", s.Topic, s.Partition)
 	}()
 
-	s.ApplyChanges(changes, send, stats)
+	s.ApplyChanges(changes, send, stats, cancel)
 	finish()
 
 	stats.SyncDuration = time.Since(startSyncTime)
-
-	stats.TotalDuration = time.Since(startTime)
+	stats.TotalDuration = stats.Elapsed()
 
 	return
 }
@@ -137,8 +146,24 @@ func (s *Syncer) SetupProducer(kafka sarama.Client, stats *Stats) (send func(Key
 	return
 }
 
-func (s *Syncer) ApplyChanges(changes <-chan diff.Change, send func(KeyValue), stats *Stats) {
-	for change := range changes {
+func (s *Syncer) ApplyChanges(changes <-chan diff.Change, send func(KeyValue), stats *Stats, cancel <-chan bool) {
+	for {
+		var (
+			change diff.Change
+			ok     bool
+		)
+
+		select {
+		case <-cancel:
+			return // cancelled
+
+		case change, ok = <-changes:
+			if !ok {
+				// end of changes
+				return
+			}
+		}
+
 		switch change.Type {
 		case diff.Deleted:
 			send(KeyValue{change.Key, s.RemovedValue})
@@ -165,7 +190,7 @@ func (s *Syncer) ApplyChanges(changes <-chan diff.Change, send func(KeyValue), s
 	}
 }
 
-func (s *Syncer) IndexTopic(kafka sarama.Client, index *diff.Index) (msgCount uint64, err error) {
+func (s *Syncer) IndexTopic(kafka sarama.Client, index diff.Index) (msgCount uint64, err error) {
 	topic := s.Topic
 	partition := s.Partition
 
@@ -183,12 +208,27 @@ func (s *Syncer) IndexTopic(kafka sarama.Client, index *diff.Index) (msgCount ui
 		return
 	}
 
+	var resumeOffset int64
+	resumeKey, err := index.ResumeKey()
+	if err != nil {
+		return
+	}
+
+	if resumeKey == nil {
+		resumeOffset = sarama.OffsetOldest
+	} else {
+		_, err = fmt.Fscanf(bytes.NewBuffer(resumeKey), "%x", &resumeOffset)
+		if err != nil {
+			return
+		}
+	}
+
 	consumer, err := sarama.NewConsumerFromClient(kafka)
 	if err != nil {
 		return
 	}
 
-	pc, err := consumer.ConsumePartition(topic, partition, sarama.OffsetOldest)
+	pc, err := consumer.ConsumePartition(topic, partition, resumeOffset)
 	if err != nil {
 		return
 	}
@@ -205,7 +245,7 @@ func (s *Syncer) IndexTopic(kafka sarama.Client, index *diff.Index) (msgCount ui
 		if bytes.Equal(value, s.RemovedValue) {
 			value = nil
 		}
-		index.Index(KeyValue{m.Key, value})
+		index.Index(KeyValue{m.Key, value}, []byte(fmt.Sprintf("%16x", m.Offset)))
 		msgCount += 1
 
 		if m.Offset+1 >= highWater {

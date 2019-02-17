@@ -12,9 +12,14 @@ import (
 const kvBufferSize = 1000
 
 type KeyValue = kafkasync.KeyValue
+type SyncStats = kafkasync.Stats
 
 type SyncInitInfo struct {
-	Mode string `json:"mode"`
+	// Format of data. Can be `json` or `binary`.
+	Format string `json:"format"`
+
+	// DoDelete makes the sync delete unseen keys. No deletions if false (the default case).
+	DoDelete bool `json:"doDelete"`
 }
 
 type SyncResult struct {
@@ -51,18 +56,24 @@ func handleConn(conn net.Conn) {
 	wg.Add(1)
 
 	var (
-		syncStats *kafkasync.Stats
+		syncStats *SyncStats
 		syncErr   error
 	)
 
-	syncer := kafkasync.New(*targetTopic)
+	cancel := make(chan bool, 1)
+
 	go func() {
 		defer wg.Done()
-		syncStats, syncErr = syncer.Sync(kafka, kvSource)
+		syncStats, syncErr = (&syncSpec{
+			Source:      kvSource,
+			TargetTopic: *targetTopic,
+			DoDelete:    init.DoDelete,
+			Cancel:      cancel,
+		}).sync()
 	}()
 
 	var err error
-	switch init.Mode {
+	switch init.Format {
 	case "json":
 		err = readJsonKVs(dec, kvSource)
 
@@ -70,14 +81,14 @@ func handleConn(conn net.Conn) {
 		err = readBinaryKVs(dec, kvSource)
 
 	default:
-		log.Print("unknown mode %q, closing connection from %v", init.Mode, conn.RemoteAddr())
+		log.Print("unknown mode %q, closing connection from %v", init.Format, conn.RemoteAddr())
 		return
 	}
 
 	if err != nil {
 		log.Print("failed to read values from %v: %v", conn.RemoteAddr(), err)
-		// FIXME should cancel syncer
-		log.Fatal("failing to be safe: ", err)
+		close(cancel)
+		return
 	}
 
 	close(kvSource)

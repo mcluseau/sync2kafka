@@ -16,14 +16,19 @@ github.com/eapache/queue
 github.com/golang/glog
 # github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 github.com/golang/snappy
-# github.com/mcluseau/go-diff v0.0.0-20170912074617-100286016ffb
+# github.com/mcluseau/go-diff v0.0.0-20190217070514-1389e11729fe
 github.com/mcluseau/go-diff
-# github.com/mcluseau/kafka-sync v0.0.0-20180212005405-9c9d18e48b85
+github.com/mcluseau/go-diff/boltindex
+# github.com/mcluseau/kafka-sync v0.0.0-20190217070708-e748adad7a6e
 github.com/mcluseau/kafka-sync
+# github.com/oklog/ulid v1.3.1
+github.com/oklog/ulid
 # github.com/pierrec/lz4 v2.0.5+incompatible
 github.com/pierrec/lz4
 github.com/pierrec/lz4/internal/xxh32
 # github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a
 github.com/rcrowley/go-metrics
-# golang.org/x/sys v0.0.0-20190214214411-e77772198cdc
+# github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72
+github.com/spaolacci/murmur3
+# golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a
 golang.org/x/sys/unix

@@ -20,6 +20,8 @@ func main() {
 	setupStore()
 	setupKafka()
 
+	indexTopic(*targetTopic)
+
 	var listener net.Listener
 
 	if len(*tlsKeyPath) != 0 { // TLS mode
