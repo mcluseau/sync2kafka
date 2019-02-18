@@ -18,7 +18,7 @@ const kvBufferSize = 1000
 
 var (
 	token             = flag.String("token", "", "Require a token to operate")
-	allowAllTopics    = flag.Bool("allowed-all-topics", false, "Allow any topic to be synchronized")
+	allowAllTopics    = flag.Bool("allow-all-topics", false, "Allow any topic to be synchronized")
 	allowedTopicsFile = flag.String("allowed-topics-file", "", "File containing allowed topics (1 per line; # is comment)")
 )
 
