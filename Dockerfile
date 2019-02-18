@@ -5,7 +5,7 @@ run apk add --update musl-dev gcc
 env p isi.nc/common/sync2kafka
 
 add . /go/src/${p}/
-run go install ${p}
+run go install ${p}/cmd/...
 
 # ------------------------------------------------------------------------
 from alpine:3.8
