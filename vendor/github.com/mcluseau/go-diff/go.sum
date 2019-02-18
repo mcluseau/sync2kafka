@@ -13,8 +13,10 @@ github.com/eapache/queue v1.1.0/go.mod h1:6eCeP0CKFpHLu8blIFXhExK/dRa7WDZfr6jVFP
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
 github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/mcluseau/go-diff v0.0.0-20190217060838-3fb7d95173c4/go.mod h1:x675JhPjVpAWQw9YUgnxa0ghj5F+ST+uI9r1bBdiwfY=
+github.com/mcluseau/go-diff v0.0.0-20190218023921-9c316fb186c9/go.mod h1:0mOslDFEA5LkBGDY4lHwPUOmZwpSANkV3qrqrA/jjcc=
 github.com/mcluseau/kafka-sync v0.0.0-20190217062914-bf952ff087bb h1:hXR5EY+qiOA1HibFj1x5FJP3sKrQnR1NkaHwb2U0fyI=
 github.com/mcluseau/kafka-sync v0.0.0-20190217062914-bf952ff087bb/go.mod h1:J8Wuc/mWmlYiCSnr5wcrA6sN+s6Le0hty1VgmXI2G/M=
+github.com/mcluseau/kafka-sync v0.0.0-20190218023944-6df3e633d270/go.mod h1:cB4W7u1RzJzPjToU5bipAEC9SsG2yIMU1zrGsWxcJY0=
 github.com/oklog/ulid v1.3.1 h1:EGfNDEx6MqHz8B3uNV6QAib1UR2Lm97sHi3ocA6ESJ4=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/pierrec/lz4 v2.0.5+incompatible h1:2xWsjqPFWcplujydGg4WmhC/6fZqK42wMM8aXeqhl0I=

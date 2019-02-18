@@ -16,7 +16,8 @@ const kvBufferSize = 1000
 
 var (
 	token             = flag.String("token", "", "Require a token to operate")
-	allowedTopicsFile = flag.String("allowed-topics-file", "", "File containing allowed topics (1 per line)")
+	allowAllTopics    = flag.Bool("allowed-all-topics", false, "Allow any topic to be synchronized")
+	allowedTopicsFile = flag.String("allowed-topics-file", "", "File containing allowed topics (1 per line; # is comment)")
 )
 
 type KeyValue = kafkasync.KeyValue
@@ -84,15 +85,7 @@ func handleConn(conn net.Conn) {
 
 	topic := *targetTopic
 	if len(init.Topic) != 0 {
-		allowed := false
-		for _, allowedTopic := range allowedTopics() {
-			if init.Topic == allowedTopic {
-				allowed = true
-				break
-			}
-		}
-
-		if !allowed {
+		if !isTopicAllowed(init.Topic) {
 			log.Print("rejecting topic %q requested by remote %v", init.Topic, conn.RemoteAddr())
 			return
 		}
@@ -182,34 +175,45 @@ func readBinaryKVs(dec *json.Decoder, out chan KeyValue) error {
 	}
 }
 
-func allowedTopics() (res []string) {
-	if len(*allowedTopicsFile) == 0 {
-		return
+func isTopicAllowed(topic string) bool {
+	if *allowAllTopics {
+		return true
 	}
 
-	res = make([]string, 0)
+	if len(*allowedTopicsFile) == 0 {
+		return topic == *targetTopic
+	}
 
+	// check allowed topics file
 	file, err := os.Open(*allowedTopicsFile)
 	if err != nil {
-		log.Print("failed to open allowed topics file, allowing none: ", err)
-		return
+		log.Print("failed to open allowed topics file, not allowing: ", err)
+		return false
 	}
 
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		topic := scanner.Text()
+		line := scanner.Text()
 		if len(topic) == 0 {
 			continue
 		}
-		res = append(res, topic)
+
+		if line[0] == '#' {
+			continue
+		}
+
+		if line == topic {
+			return true
+		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Printf("failed to read allowed topics (allowing %d): %v", len(res), err)
-		return
+		log.Printf("failed to read allowed topics, not allowing: %v", err)
+		return false
 	}
 
-	return
+	// nothing more to allow
+	return false
 }

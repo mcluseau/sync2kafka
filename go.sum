@@ -42,6 +42,8 @@ github.com/mcluseau/go-diff v0.0.0-20190218023016-2fd1253ba6e4 h1:PFZu6fGaPeZ8U9
 github.com/mcluseau/go-diff v0.0.0-20190218023016-2fd1253ba6e4/go.mod h1:0mOslDFEA5LkBGDY4lHwPUOmZwpSANkV3qrqrA/jjcc=
 github.com/mcluseau/go-diff v0.0.0-20190218023921-9c316fb186c9 h1:WmrcqmOZ40AKtoYzfGYRZoxQjKEeXejwPWwn3Kcu/bU=
 github.com/mcluseau/go-diff v0.0.0-20190218023921-9c316fb186c9/go.mod h1:0mOslDFEA5LkBGDY4lHwPUOmZwpSANkV3qrqrA/jjcc=
+github.com/mcluseau/go-diff v0.0.0-20190218055646-1596c2d9945b h1:FX8yz2n/ty4SPlP+IzGeJYv+Jsz0iamUoZepgxE+0fE=
+github.com/mcluseau/go-diff v0.0.0-20190218055646-1596c2d9945b/go.mod h1:Dh8bN8I/kRrC1IYQaBMqyC5gp3bXqXstptmgwpw+kjw=
 github.com/mcluseau/kafka-sync v0.0.0-20180212005405-9c9d18e48b85 h1:oSB8tWTsbOfnP9iWnbPIhd7k3gAuq2S5MYzPTCEedUg=
 github.com/mcluseau/kafka-sync v0.0.0-20180212005405-9c9d18e48b85/go.mod h1:6qnyIKF8kWNWNxqvHy9U+YRyzgMbSlf1+vhDw9WMACM=
 github.com/mcluseau/kafka-sync v0.0.0-20190215082904-9a122a90f405 h1:9qrJuf9T72/IqV2viUmwpWferaY3O3Cxr8m+YE9Y2BA=
@@ -86,6 +88,8 @@ github.com/mcluseau/kafka-sync v0.0.0-20190218023150-142c525b1e66 h1:WNxwz1UblNv
 github.com/mcluseau/kafka-sync v0.0.0-20190218023150-142c525b1e66/go.mod h1:+LFXruUpq8v4sMAriHSeVWoX2bfVf6bDCaZDSqpU2YI=
 github.com/mcluseau/kafka-sync v0.0.0-20190218023944-6df3e633d270 h1:hXoGHawCFE5Vzc8pLOyy1e0bRZKViMXfj61dYbO9SF8=
 github.com/mcluseau/kafka-sync v0.0.0-20190218023944-6df3e633d270/go.mod h1:cB4W7u1RzJzPjToU5bipAEC9SsG2yIMU1zrGsWxcJY0=
+github.com/mcluseau/kafka-sync v0.0.0-20190218055715-c96a05330a7a h1:98CCmxSwDgSAwNEnLSEadAQhtg22M6gQhVkwFHP2c/Q=
+github.com/mcluseau/kafka-sync v0.0.0-20190218055715-c96a05330a7a/go.mod h1:0y7AoqU22bvOm6SnP2fXpnZIyi3mK769odyN751eG2Y=
 github.com/oklog/ulid v1.3.1 h1:EGfNDEx6MqHz8B3uNV6QAib1UR2Lm97sHi3ocA6ESJ4=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/pierrec/lz4 v2.0.5+incompatible h1:2xWsjqPFWcplujydGg4WmhC/6fZqK42wMM8aXeqhl0I=
@@ -100,3 +104,4 @@ golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a h1:1BGLXjeY4akVXGgbC9HugT3Jv
 golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 isi.nc/common/sync2kafka v0.0.0-20190215041350-86ed9ab9a363 h1:2ciTeDQInK3FZ5p4UxDfWdGVIFDjOZthhCJ9eGNelSA=
 isi.nc/common/sync2kafka v0.1.0 h1:kkfQIgE0DEhYIDnxXouSEZa5hcrmzIyBkTZ4rWZmlRw=
+isi.nc/common/sync2kafka v0.2.0 h1:jlY1E7XvaXz+jrtwhSNxQa+i0Z5kit6YgPzWA6PDBR4=

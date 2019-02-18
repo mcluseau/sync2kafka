@@ -16,10 +16,10 @@ github.com/eapache/queue
 github.com/golang/glog
 # github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 github.com/golang/snappy
-# github.com/mcluseau/go-diff v0.0.0-20190218023921-9c316fb186c9
+# github.com/mcluseau/go-diff v0.0.0-20190218055646-1596c2d9945b
 github.com/mcluseau/go-diff
 github.com/mcluseau/go-diff/boltindex
-# github.com/mcluseau/kafka-sync v0.0.0-20190218023944-6df3e633d270
+# github.com/mcluseau/kafka-sync v0.0.0-20190218055715-c96a05330a7a
 github.com/mcluseau/kafka-sync
 # github.com/oklog/ulid v1.3.1
 github.com/oklog/ulid

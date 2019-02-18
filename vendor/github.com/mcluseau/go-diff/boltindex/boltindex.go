@@ -168,9 +168,8 @@ func (i *Index) Compare(kv KeyValue) (result diff.CompareResult, err error) {
 
 	if bytes.Equal(valueHash, currentValueHash) {
 		return diff.UnchangedKey, nil
-	} else {
-		return diff.ModifiedKey, nil
 	}
+	return diff.ModifiedKey, nil
 }
 
 func (i *Index) writeSeen() {
