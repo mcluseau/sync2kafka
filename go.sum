@@ -36,6 +36,12 @@ github.com/mcluseau/go-diff v0.0.0-20190218000714-53daffcafc17 h1:VzgjvJr7RMCCcJ
 github.com/mcluseau/go-diff v0.0.0-20190218000714-53daffcafc17/go.mod h1:0mOslDFEA5LkBGDY4lHwPUOmZwpSANkV3qrqrA/jjcc=
 github.com/mcluseau/go-diff v0.0.0-20190218013846-15855db22145 h1:9w/ygK5aS2cGZoHHjcftW3YLKJeOn4kFgjdBm4lnWPU=
 github.com/mcluseau/go-diff v0.0.0-20190218013846-15855db22145/go.mod h1:0mOslDFEA5LkBGDY4lHwPUOmZwpSANkV3qrqrA/jjcc=
+github.com/mcluseau/go-diff v0.0.0-20190218021315-6512e0060996 h1:cy1c37SfCusbFi8Es+q0keOrPO+/T0yIwQFlbH85NFg=
+github.com/mcluseau/go-diff v0.0.0-20190218021315-6512e0060996/go.mod h1:0mOslDFEA5LkBGDY4lHwPUOmZwpSANkV3qrqrA/jjcc=
+github.com/mcluseau/go-diff v0.0.0-20190218023016-2fd1253ba6e4 h1:PFZu6fGaPeZ8U9tcehRMJCUb7VKNbzLDLaMacRMo0jQ=
+github.com/mcluseau/go-diff v0.0.0-20190218023016-2fd1253ba6e4/go.mod h1:0mOslDFEA5LkBGDY4lHwPUOmZwpSANkV3qrqrA/jjcc=
+github.com/mcluseau/go-diff v0.0.0-20190218023921-9c316fb186c9 h1:WmrcqmOZ40AKtoYzfGYRZoxQjKEeXejwPWwn3Kcu/bU=
+github.com/mcluseau/go-diff v0.0.0-20190218023921-9c316fb186c9/go.mod h1:0mOslDFEA5LkBGDY4lHwPUOmZwpSANkV3qrqrA/jjcc=
 github.com/mcluseau/kafka-sync v0.0.0-20180212005405-9c9d18e48b85 h1:oSB8tWTsbOfnP9iWnbPIhd7k3gAuq2S5MYzPTCEedUg=
 github.com/mcluseau/kafka-sync v0.0.0-20180212005405-9c9d18e48b85/go.mod h1:6qnyIKF8kWNWNxqvHy9U+YRyzgMbSlf1+vhDw9WMACM=
 github.com/mcluseau/kafka-sync v0.0.0-20190215082904-9a122a90f405 h1:9qrJuf9T72/IqV2viUmwpWferaY3O3Cxr8m+YE9Y2BA=
@@ -74,6 +80,12 @@ github.com/mcluseau/kafka-sync v0.0.0-20190218000732-47713cf6b2bf h1:AwyGo2E4cZ4
 github.com/mcluseau/kafka-sync v0.0.0-20190218000732-47713cf6b2bf/go.mod h1:vmKSVapa5NGbGrVXb5BtmauaGpiRQ6urFUBm0JbAts0=
 github.com/mcluseau/kafka-sync v0.0.0-20190218020115-3c63eee961f4 h1:TmUwMrvIgrjUoPY0ivOfkpUpbG+n7M+qUQy7WCPSUmU=
 github.com/mcluseau/kafka-sync v0.0.0-20190218020115-3c63eee961f4/go.mod h1:LcPIZTw66YxxNNDI69MxNpO0HHV3WSVzWFxxqPnT/+0=
+github.com/mcluseau/kafka-sync v0.0.0-20190218021336-bb0cb6f6408d h1:slKU0X7IoBoCQRdn6wyhWC5h8gLPBSiEUFH9Tz/V0jY=
+github.com/mcluseau/kafka-sync v0.0.0-20190218021336-bb0cb6f6408d/go.mod h1:9phOZngth2luf8vapqP0C6wF7r5eVx6vBpJHjHUoZ28=
+github.com/mcluseau/kafka-sync v0.0.0-20190218023150-142c525b1e66 h1:WNxwz1UblNv1hwIIzRP85h0ahk/ORedd4i7/ThtiQjc=
+github.com/mcluseau/kafka-sync v0.0.0-20190218023150-142c525b1e66/go.mod h1:+LFXruUpq8v4sMAriHSeVWoX2bfVf6bDCaZDSqpU2YI=
+github.com/mcluseau/kafka-sync v0.0.0-20190218023944-6df3e633d270 h1:hXoGHawCFE5Vzc8pLOyy1e0bRZKViMXfj61dYbO9SF8=
+github.com/mcluseau/kafka-sync v0.0.0-20190218023944-6df3e633d270/go.mod h1:cB4W7u1RzJzPjToU5bipAEC9SsG2yIMU1zrGsWxcJY0=
 github.com/oklog/ulid v1.3.1 h1:EGfNDEx6MqHz8B3uNV6QAib1UR2Lm97sHi3ocA6ESJ4=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/pierrec/lz4 v2.0.5+incompatible h1:2xWsjqPFWcplujydGg4WmhC/6fZqK42wMM8aXeqhl0I=

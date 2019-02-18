@@ -2,15 +2,23 @@ package main
 
 import (
 	"log"
+	"sync"
 
 	"github.com/mcluseau/go-diff/boltindex"
 	kafkasync "github.com/mcluseau/kafka-sync"
+)
+
+var (
+	topicLock = sync.Mutex{}
 )
 
 func indexTopic(topic string) (err error) {
 	if !hasStore {
 		return
 	}
+
+	topicLock.Lock()
+	defer topicLock.Unlock()
 
 	index, err := boltindex.New(db, []byte(topic), false)
 	if err != nil {

@@ -2,10 +2,10 @@ package boltindex
 
 import (
 	"bytes"
-	"log"
 	"sync"
 
 	"github.com/boltdb/bolt"
+	"github.com/golang/glog"
 
 	diff "github.com/mcluseau/go-diff"
 )
@@ -71,11 +71,6 @@ var _ diff.Index = &Index{}
 
 // Cleanup removes temp data produced by this index
 func (i *Index) Cleanup() (err error) {
-	if i.seenStream != nil {
-		close(i.seenStream)
-		i.seenWG.Wait()
-	}
-
 	if i.seenBucketName != nil {
 		err = i.db.Update(func(tx *bolt.Tx) (err error) {
 			tx.DeleteBucket(i.seenBucketName)
@@ -181,37 +176,37 @@ func (i *Index) Compare(kv KeyValue) (result diff.CompareResult, err error) {
 func (i *Index) writeSeen() {
 	defer i.seenWG.Done()
 
-	batchCount := 0
-	batch := make([]byte, 0, seenBatchSize*hashLen)
+	batch := make([]hash, 0, seenBatchSize)
 
 	saveBatch := func() (err error) {
-		log.Printf("save batch: %d entries", batchCount)
+		glog.V(5).Infof("boltindex: seen batch: %d entries", len(batch))
 		err = i.db.Update(func(tx *bolt.Tx) (err error) {
 			bucket := tx.Bucket(i.seenBucketName)
 
-			for i := 0; i < batchCount; i++ {
-				bucket.Put(batch[i*hashLen:i+1*hashLen], []byte{})
+			for _, h := range batch {
+				bucket.Put(h.Sum(nil), []byte{})
 			}
-
 			return
 		})
-		if err == nil {
-			batch = batch[0:0]
-			batchCount = 0
+
+		if err != nil {
+			panic(err)
 		}
+
+		batch = batch[:0]
 		return
 	}
 
 	for h := range i.seenStream {
-		h.Sum(batch)
-		batchCount++
-
-		if batchCount == seenBatchSize {
+		batch = append(batch, h)
+		if len(batch) == seenBatchSize {
 			saveBatch()
 		}
 	}
 
-	if batchCount != 0 {
+	i.seenStream = nil
+
+	if len(batch) != 0 {
 		saveBatch()
 	}
 }
