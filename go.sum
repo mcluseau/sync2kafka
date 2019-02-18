@@ -99,3 +99,4 @@ golang.org/x/sys v0.0.0-20190214214411-e77772198cdc/go.mod h1:STP8DvDyc/dI5b8T5h
 golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a h1:1BGLXjeY4akVXGgbC9HugT3Jv3hCI0z56oJR5vAMgBU=
 golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 isi.nc/common/sync2kafka v0.0.0-20190215041350-86ed9ab9a363 h1:2ciTeDQInK3FZ5p4UxDfWdGVIFDjOZthhCJ9eGNelSA=
+isi.nc/common/sync2kafka v0.1.0 h1:kkfQIgE0DEhYIDnxXouSEZa5hcrmzIyBkTZ4rWZmlRw=

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"log"
 	"net"
+	"os"
 	"sync"
 
 	kafkasync "github.com/mcluseau/kafka-sync"
@@ -12,7 +14,10 @@ import (
 
 const kvBufferSize = 1000
 
-var token = flag.String("token", "", "Require a token to operate")
+var (
+	token             = flag.String("token", "", "Require a token to operate")
+	allowedTopicsFile = flag.String("allowed-topics-file", "", "File containing allowed topics (1 per line)")
+)
 
 type KeyValue = kafkasync.KeyValue
 type SyncStats = kafkasync.Stats
@@ -26,6 +31,9 @@ type SyncInitInfo struct {
 
 	// Token for authn
 	Token string `json:"token"`
+
+	// Topic target topic if not default
+	Topic string `json:"topic"`
 }
 
 type SyncResult struct {
@@ -74,13 +82,31 @@ func handleConn(conn net.Conn) {
 	cancel := make(chan bool, 1)
 	defer close(cancel)
 
+	topic := *targetTopic
+	if len(init.Topic) != 0 {
+		allowed := false
+		for _, allowedTopic := range allowedTopics() {
+			if init.Topic == allowedTopic {
+				allowed = true
+				break
+			}
+		}
+
+		if !allowed {
+			log.Print("rejecting topic %q requested by remote %v", init.Topic, conn.RemoteAddr())
+			return
+		}
+
+		topic = init.Topic
+	}
+
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		syncStats, syncErr = (&syncSpec{
 			Source:      kvSource,
-			TargetTopic: *targetTopic,
+			TargetTopic: topic,
 			DoDelete:    init.DoDelete,
 			Cancel:      cancel,
 		}).sync()
@@ -154,4 +180,36 @@ func readBinaryKVs(dec *json.Decoder, out chan KeyValue) error {
 			Value: obj.Value,
 		}
 	}
+}
+
+func allowedTopics() (res []string) {
+	if len(*allowedTopicsFile) == 0 {
+		return
+	}
+
+	res = make([]string, 0)
+
+	file, err := os.Open(*allowedTopicsFile)
+	if err != nil {
+		log.Print("failed to open allowed topics file, allowing none: ", err)
+		return
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		topic := scanner.Text()
+		if len(topic) == 0 {
+			continue
+		}
+		res = append(res, topic)
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Printf("failed to read allowed topics (allowing %d): %v", len(res), err)
+		return
+	}
+
+	return
 }
