@@ -2,11 +2,15 @@ package boltindex
 
 import (
 	"bytes"
+	"log"
+	"sync"
 
 	"github.com/boltdb/bolt"
 
 	diff "github.com/mcluseau/go-diff"
 )
+
+const seenBatchSize = 1000
 
 var (
 	resumeKeyKey = []byte("resumeKey")
@@ -26,101 +30,92 @@ type Index struct {
 	metaBucketName []byte
 	recordSeen     bool
 	seenBucketName []byte
+	seenStream     chan hash
+	seenWG         sync.WaitGroup
 }
 
 func New(db *bolt.DB, bucket []byte, recordSeen bool) (idx *Index, err error) {
+	var seenBucketName []byte
+
+	if err = db.Update(func(tx *bolt.Tx) (err error) {
+		if _, err = tx.CreateBucketIfNotExists(bucket); err != nil {
+			return
+		}
+
+		if recordSeen {
+			ulid := newUlid()
+			seenBucketName = append(seenPrefix, ulid[:]...)
+
+			if _, err = tx.CreateBucket(seenBucketName); err != nil {
+				return
+			}
+		}
+
+		return
+	}); err != nil {
+		return
+	}
+
 	idx = &Index{
 		db:             db,
 		bucketName:     bucket,
 		metaBucketName: append(metaPrefix, bucket...),
 		recordSeen:     recordSeen,
+		seenBucketName: seenBucketName,
+		seenWG:         sync.WaitGroup{},
 	}
 	return
 }
 
 var _ diff.Index = &Index{}
 
-func (i *Index) bucket(writable bool) (tx *bolt.Tx, bucket *bolt.Bucket, err error) {
-	tx, err = i.db.Begin(writable)
-	if err != nil {
-		return
-	}
-
-	bucket = tx.Bucket(i.bucketName)
-	return
-}
-
-func (i *Index) seenBucket(tx *bolt.Tx) (bucket *bolt.Bucket, err error) {
-	if i.seenBucketName == nil {
-		ulid := newUlid()
-		seenBucket := append(seenPrefix, ulid[:]...)
-
-		if _, err = tx.CreateBucket(seenBucket); err != nil {
-			tx.Rollback()
-			return
-		}
-
-		tx.OnCommit(func() {
-			i.seenBucketName = seenBucket
-		})
-	}
-
-	bucket = tx.Bucket(i.seenBucketName)
-	return
-}
-
 // Cleanup removes temp data produced by this index
 func (i *Index) Cleanup() (err error) {
-	if i.seenBucketName == nil {
-		return
+	if i.seenStream != nil {
+		close(i.seenStream)
+		i.seenWG.Wait()
 	}
 
-	err = i.db.Update(func(tx *bolt.Tx) (err error) {
-		tx.DeleteBucket(i.seenBucketName)
-		tx.OnCommit(func() {
-			i.seenBucketName = nil
+	if i.seenBucketName != nil {
+		err = i.db.Update(func(tx *bolt.Tx) (err error) {
+			tx.DeleteBucket(i.seenBucketName)
+			tx.OnCommit(func() {
+				i.seenBucketName = nil
+			})
+			return
 		})
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+func (i *Index) Index(kvs <-chan KeyValue, resumeKey <-chan []byte) (err error) {
+	return i.db.Update(func(tx *bolt.Tx) (err error) {
+		bucket := tx.Bucket(i.bucketName)
+
+		for kv := range kvs {
+			if len(kv.Value) == 0 {
+				// deletion
+				err = bucket.Delete(kv.Key)
+			} else {
+				// create/update
+				err = bucket.Put(kv.Key, hashOf(kv.Value).Sum(nil))
+			}
+
+			if err != nil {
+				return
+			}
+		}
+
+		if resumeKey != nil {
+			// record resumeKey
+			err = i.storeResumeKey(tx, <-resumeKey)
+		}
 		return
 	})
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-func commitOrRollback(tx *bolt.Tx, err error) {
-	if err == nil {
-		tx.Commit()
-	} else {
-		tx.Rollback()
-	}
-}
-
-func (i *Index) Index(kv KeyValue, resumeKey []byte) (err error) {
-	tx, bucket, err := i.bucket(true)
-	if err != nil {
-		return
-	}
-
-	defer commitOrRollback(tx, err)
-
-	if resumeKey != nil {
-		// record resumeKey
-		err = i.storeResumeKey(tx, resumeKey)
-	}
-
-	key := append([]byte("k:"), kv.Key...)
-
-	if kv.Value == nil {
-		// deletion
-		err = bucket.Delete(key)
-		return
-	}
-
-	// create/update
-	err = bucket.Put(kv.Key, hashOf(kv.Value).Sum(nil))
-	return
 }
 
 func (i *Index) storeResumeKey(tx *bolt.Tx, resumeKey []byte) (err error) {
@@ -149,18 +144,26 @@ func (i *Index) Compare(kv KeyValue) (result diff.CompareResult, err error) {
 		panic("nil values are not allowed here")
 	}
 
-	tx, bucket, err := i.bucket(false)
+	var currentValueHash []byte
+
+	err = i.db.View(func(tx *bolt.Tx) error {
+		currentValueHash = tx.Bucket(i.bucketName).Get(kv.Key)
+		return nil
+	})
+
 	if err != nil {
 		return
 	}
 
-	defer commitOrRollback(tx, err)
+	if i.recordSeen {
+		if i.seenStream == nil {
+			i.seenStream = make(chan hash, seenBatchSize)
+			i.seenWG.Add(1)
+			go i.writeSeen()
+		}
 
-	if err = i.recordSeenKey(kv.Key); err != nil {
-		return
+		i.seenStream <- hashOf(kv.Key)
 	}
-
-	currentValueHash := bucket.Get(kv.Key)
 
 	if currentValueHash == nil {
 		return diff.MissingKey, nil
@@ -175,20 +178,42 @@ func (i *Index) Compare(kv KeyValue) (result diff.CompareResult, err error) {
 	}
 }
 
-func (i *Index) recordSeenKey(key []byte) error {
-	if !i.recordSeen {
-		return nil
+func (i *Index) writeSeen() {
+	defer i.seenWG.Done()
+
+	batchCount := 0
+	batch := make([]byte, 0, seenBatchSize*hashLen)
+
+	saveBatch := func() (err error) {
+		log.Printf("save batch: %d entries", batchCount)
+		err = i.db.Update(func(tx *bolt.Tx) (err error) {
+			bucket := tx.Bucket(i.seenBucketName)
+
+			for i := 0; i < batchCount; i++ {
+				bucket.Put(batch[i*hashLen:i+1*hashLen], []byte{})
+			}
+
+			return
+		})
+		if err == nil {
+			batch = batch[0:0]
+			batchCount = 0
+		}
+		return
 	}
 
-	return i.db.Update(func(tx *bolt.Tx) (err error) {
-		seenBucket, err := i.seenBucket(tx)
-		if err != nil {
-			return
-		}
+	for h := range i.seenStream {
+		h.Sum(batch)
+		batchCount++
 
-		err = seenBucket.Put(hashOf(key).Sum(nil), nil)
-		return
-	})
+		if batchCount == seenBatchSize {
+			saveBatch()
+		}
+	}
+
+	if batchCount != 0 {
+		saveBatch()
+	}
 }
 
 func (i *Index) KeysNotSeen() <-chan []byte {
@@ -198,31 +223,38 @@ func (i *Index) KeysNotSeen() <-chan []byte {
 
 	ch := make(chan []byte, 10)
 
-	go func() {
-		defer close(ch)
-
-		if err := i.db.View(func(tx *bolt.Tx) (err error) {
-			keysBucket := tx.Bucket(i.bucketName)
-			seenBucket := tx.Bucket(i.seenBucketName)
-
-			err = keysBucket.ForEach(func(k, v []byte) (err error) {
-				if seenBucket == nil {
-					// no seenBucket => nothing was seen
-					ch <- k
-				}
-				if seenBucket.Get(hashOf(k).Sum(nil)) == nil {
-					ch <- k
-				}
-				return
-			})
-			return
-
-		}); err != nil {
-			panic(err)
-		}
-	}()
+	go i.sendKeysNotSeen(ch)
 
 	return ch
+}
+
+func (i *Index) sendKeysNotSeen(ch chan []byte) {
+	defer close(ch)
+
+	if i.seenStream != nil {
+		close(i.seenStream)
+		i.seenWG.Wait()
+	}
+
+	if err := i.db.View(func(tx *bolt.Tx) (err error) {
+		keysBucket := tx.Bucket(i.bucketName)
+		seenBucket := tx.Bucket(i.seenBucketName)
+
+		err = keysBucket.ForEach(func(k, v []byte) (err error) {
+			if seenBucket == nil {
+				// no seenBucket => nothing was seen
+				ch <- k
+			}
+			if seenBucket.Get(hashOf(k).Sum(nil)) == nil {
+				ch <- k
+			}
+			return
+		})
+		return
+
+	}); err != nil {
+		panic(err)
+	}
 }
 
 func (i *Index) Value(key []byte) []byte {

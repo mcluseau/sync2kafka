@@ -2,6 +2,8 @@ package diff
 
 import (
 	"sync"
+
+	"github.com/golang/glog"
 )
 
 // Compares a store (currentValues) with a reference (referenceValues), streaming the reference.
@@ -22,17 +24,19 @@ func Diff(referenceValues, currentValues <-chan KeyValue, changes chan Change, c
 	wg.Add(2)
 
 	go func() {
-		for kv := range referenceValues {
-			referenceIndex.Index(kv, nil)
+		defer wg.Done()
+		err := referenceIndex.Index(referenceValues, nil)
+		if err != nil {
+			panic(err)
 		}
-		wg.Done()
 	}()
 
 	go func() {
-		for kv := range currentValues {
-			currentIndex.Index(kv, nil)
+		defer wg.Done()
+		err := currentIndex.Index(currentValues, nil)
+		if err != nil {
+			panic(err)
 		}
-		wg.Done()
 	}()
 
 	wg.Wait()
@@ -50,8 +54,8 @@ func Diff(referenceValues, currentValues <-chan KeyValue, changes chan Change, c
 func DiffStreamReference(referenceValues, currentValues <-chan KeyValue, changes chan Change, cancel <-chan bool) {
 	currentIndex := NewIndex(false)
 
-	for kv := range currentValues {
-		currentIndex.Index(kv, nil)
+	if err := currentIndex.Index(currentValues, nil); err != nil {
+		panic(err)
 	}
 
 	DiffStreamIndex(referenceValues, currentIndex, changes, cancel)
@@ -65,6 +69,8 @@ func DiffStreamReference(referenceValues, currentValues <-chan KeyValue, changes
 //
 // The changes channel will receive the changes, including Unchanged.
 func DiffStreamIndex(referenceValues <-chan KeyValue, currentIndex Index, changes chan Change, cancel <-chan bool) {
+	glog.V(4).Info("DiffStreamIndex: starting")
+	defer glog.V(4).Info("DiffStreamIndex: finished")
 l:
 	for {
 		var (
@@ -74,14 +80,17 @@ l:
 
 		select {
 		case <-cancel:
+			glog.V(4).Info("DiffStreamIndex: cancelled")
 			return
 
 		case kv, ok = <-referenceValues:
 			if !ok {
+				glog.V(4).Info("DiffStreamIndex: end of values")
 				break l
 			}
 		}
 
+		glog.V(5).Info("DiffStreamIndex: new value")
 		cmp, err := currentIndex.Compare(kv)
 		if err != nil {
 			panic(err)
@@ -117,6 +126,7 @@ l:
 		return
 	}
 
+	glog.V(4).Info("DiffStreamIndex: deletion phase")
 	for key := range keysNotSeen {
 		changes <- Change{
 			Type: Deleted,

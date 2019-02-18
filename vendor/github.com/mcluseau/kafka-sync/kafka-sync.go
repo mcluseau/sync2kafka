@@ -11,6 +11,8 @@ import (
 	"github.com/mcluseau/go-diff"
 )
 
+const indexBatchSize = 500
+
 type Syncer struct {
 	// The topic to synchronize.
 	Topic string
@@ -61,10 +63,17 @@ func (s Syncer) SyncWithIndex(kafka sarama.Client, kvSource <-chan KeyValue, top
 
 	stats.ReadTopicDuration = stats.Elapsed()
 
-	return s.SyncWithPrepopulatedIndex(kafka, kvSource, topicIndex, cancel)
+	err = s.syncWithPrepopulatedIndex(kafka, kvSource, topicIndex, stats, cancel)
+	return
 }
 
 func (s Syncer) SyncWithPrepopulatedIndex(kafka sarama.Client, kvSource <-chan KeyValue, topicIndex diff.Index, cancel <-chan bool) (stats *Stats, err error) {
+	stats = NewStats()
+	err = s.syncWithPrepopulatedIndex(kafka, kvSource, topicIndex, stats, cancel)
+	return
+}
+
+func (s Syncer) syncWithPrepopulatedIndex(kafka sarama.Client, kvSource <-chan KeyValue, topicIndex diff.Index, stats *Stats, cancel <-chan bool) (err error) {
 
 	// Prepare producer
 	send, finish := s.SetupProducer(kafka, stats)
@@ -108,7 +117,7 @@ func (s *Syncer) SetupProducer(kafka sarama.Client, stats *Stats) (send func(Key
 		go func() {
 			for prodError := range producer.Errors() {
 				glog.Error(prodError)
-				stats.ErrorCount += 1
+				stats.ErrorCount++
 			}
 			wg.Done()
 		}()
@@ -120,7 +129,7 @@ func (s *Syncer) SetupProducer(kafka sarama.Client, stats *Stats) (send func(Key
 		wg.Add(1)
 		go func() {
 			for range producer.Successes() {
-				stats.SuccessCount += 1
+				stats.SuccessCount++
 			}
 			wg.Done()
 		}()
@@ -137,7 +146,7 @@ func (s *Syncer) SetupProducer(kafka sarama.Client, stats *Stats) (send func(Key
 			Key:       sarama.ByteEncoder(kv.Key),
 			Value:     sarama.ByteEncoder(kv.Value),
 		}
-		stats.SendCount += 1
+		stats.SendCount++
 	}
 	finish = func() {
 		producer.AsyncClose()
@@ -191,6 +200,9 @@ func (s *Syncer) ApplyChanges(changes <-chan diff.Change, send func(KeyValue), s
 }
 
 func (s *Syncer) IndexTopic(kafka sarama.Client, index diff.Index) (msgCount uint64, err error) {
+	glog.V(4).Infof("IndexTopic: starting")
+	defer glog.V(4).Infof("IndexTopic: finished")
+
 	topic := s.Topic
 	partition := s.Partition
 
@@ -203,22 +215,35 @@ func (s *Syncer) IndexTopic(kafka sarama.Client, index diff.Index) (msgCount uin
 		return
 	}
 
+	glog.V(4).Infof("-> low/high water: %d/%d", lowWater, highWater)
+
 	if highWater == 0 || lowWater == highWater {
 		// topic is empty
 		return
 	}
 
-	var resumeOffset int64
 	resumeKey, err := index.ResumeKey()
 	if err != nil {
 		return
 	}
 
+	var resumeOffset int64
 	if resumeKey == nil {
+		glog.V(4).Info("-> no resume information, starting from oldest")
 		resumeOffset = sarama.OffsetOldest
 	} else {
 		_, err = fmt.Fscanf(bytes.NewBuffer(resumeKey), "%x", &resumeOffset)
 		if err != nil {
+			return
+		}
+
+		resumeOffset++
+
+		glog.V(4).Info("-> resume offset: ", resumeOffset)
+
+		if resumeOffset >= highWater {
+			glog.V(4).Infof("-> would consume from %d, high water is %d, so we're up-to-date",
+				resumeOffset, highWater)
 			return
 		}
 	}
@@ -233,6 +258,40 @@ func (s *Syncer) IndexTopic(kafka sarama.Client, index diff.Index) (msgCount uin
 		return
 	}
 
+	wg := &sync.WaitGroup{}
+	resumeOffset = -1
+
+	kvs := make(chan KeyValue, indexBatchSize)
+	resumeKeyCh := make(chan []byte, 1)
+
+	doIndex := func() {
+		defer wg.Done()
+
+		err := index.Index(kvs, resumeKeyCh)
+		if err != nil {
+			panic(err) // FIXME
+		}
+	}
+
+	// start indexing
+	wg.Add(1)
+	go doIndex()
+
+	saveBatch := func(restart bool) {
+		// finalize indexing
+		close(kvs)
+		resumeKeyCh <- []byte(fmt.Sprintf("%16x", resumeOffset))
+		wg.Wait()
+
+		if restart {
+			// start next indexing
+			kvs = make(chan KeyValue, indexBatchSize)
+			resumeKeyCh = make(chan []byte, 1)
+			wg.Add(1)
+			go doIndex()
+		}
+	}
+
 	msgCount = 0
 	for m := range pc.Messages() {
 		hw := pc.HighWaterMarkOffset()
@@ -245,14 +304,23 @@ func (s *Syncer) IndexTopic(kafka sarama.Client, index diff.Index) (msgCount uin
 		if bytes.Equal(value, s.RemovedValue) {
 			value = nil
 		}
-		index.Index(KeyValue{m.Key, value}, []byte(fmt.Sprintf("%16x", m.Offset)))
-		msgCount += 1
+		kvs <- KeyValue{m.Key, value}
+		msgCount++
+
+		resumeOffset = m.Offset
 
 		if m.Offset+1 >= highWater {
 			break
 		}
+
+		if msgCount%indexBatchSize == 0 {
+			saveBatch(true)
+		}
 	}
 	pc.Close()
 	consumer.Close()
+
+	saveBatch(false)
+
 	return
 }

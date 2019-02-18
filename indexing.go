@@ -19,13 +19,17 @@ func indexTopic(topic string) (err error) {
 
 	syncer := kafkasync.New(topic)
 
-	log.Printf("indexing topic %s....", topic)
+	log.Printf("indexing topic %s...", topic)
 	msgCount, err := syncer.IndexTopic(kafka, index)
 
 	log.Printf("indexing topic %s: %d messages read", topic, msgCount)
 
 	if err != nil {
-		log.Printf("indexing topic %s: error: %v", err)
+		log.Printf("indexing topic %s: error: %v", topic, err)
+	}
+
+	if err := db.Sync(); err != nil {
+		log.Print("bolt DB sync failed: ", err)
 	}
 
 	return

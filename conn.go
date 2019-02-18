@@ -41,6 +41,9 @@ type BinaryKV struct {
 func handleConn(conn net.Conn) {
 	defer conn.Close()
 
+	log.Print("new connection from ", conn.RemoteAddr().String())
+	defer log.Print("closed connection from ", conn.RemoteAddr().String())
+
 	enc := json.NewEncoder(conn)
 	dec := json.NewDecoder(conn)
 
@@ -52,16 +55,16 @@ func handleConn(conn net.Conn) {
 
 	kvSource := make(chan KeyValue, kvBufferSize)
 
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-
 	var (
 		syncStats *SyncStats
 		syncErr   error
 	)
 
 	cancel := make(chan bool, 1)
+	defer close(cancel)
 
+	wg := sync.WaitGroup{}
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		syncStats, syncErr = (&syncSpec{
@@ -87,10 +90,10 @@ func handleConn(conn net.Conn) {
 
 	if err != nil {
 		log.Print("failed to read values from %v: %v", conn.RemoteAddr(), err)
-		close(cancel)
 		return
 	}
 
+	log.Print("finished reading values")
 	close(kvSource)
 	wg.Wait()
 

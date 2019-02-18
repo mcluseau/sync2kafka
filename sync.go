@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	diff "github.com/mcluseau/go-diff"
 	"github.com/mcluseau/go-diff/boltindex"
 	kafkasync "github.com/mcluseau/kafka-sync"
@@ -20,6 +22,13 @@ func (spec *syncSpec) sync() (stats *SyncStats, err error) {
 	if hasStore {
 		// use the local store
 		index, err = boltindex.New(db, []byte(spec.TargetTopic), spec.DoDelete)
+
+		defer func() {
+			if err := index.(*boltindex.Index).Cleanup(); err != nil {
+				log.Print("WARN: index cleanup failed: ", err)
+			}
+		}()
+
 	} else {
 		// in memory index; simple but slower on big datasets, as it requires reindexing the topic each time
 		index = diff.NewIndex(false)
@@ -32,10 +41,11 @@ func (spec *syncSpec) sync() (stats *SyncStats, err error) {
 	stats, err = syncer.SyncWithIndex(kafka, spec.Source, index, spec.Cancel)
 
 	if hasStore {
-		indexTopic(spec.TargetTopic)
-		if err == nil {
+		if err != nil {
 			err = db.Sync()
 		}
+
+		go indexTopic(spec.TargetTopic)
 	}
 
 	return

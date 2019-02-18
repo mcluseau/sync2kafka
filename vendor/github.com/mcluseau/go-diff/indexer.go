@@ -39,25 +39,30 @@ func NewIndex(recordValues bool) Index {
 	}
 }
 
-func (i *MemoryIndex) Index(kv KeyValue, resumeKey []byte) (err error) {
-	i.resumeKey = resumeKey
+func (i *MemoryIndex) Index(kvs <-chan KeyValue, resumeKey <-chan []byte) (err error) {
+	for kv := range kvs {
+		keyH := sha256.Sum256(kv.Key)
 
-	keyH := sha256.Sum256(kv.Key)
+		if len(kv.Value) == 0 {
+			delete(i.hashes, keyH)
+			delete(i.keyHashToKey, keyH)
+			delete(i.keyHashToValue, keyH)
+			delete(i.unseen, keyH)
+			continue
+		}
 
-	if kv.Value == nil {
-		delete(i.hashes, keyH)
-		delete(i.keyHashToKey, keyH)
-		delete(i.keyHashToValue, keyH)
-		delete(i.unseen, keyH)
-		return
+		i.hashes[keyH] = sha256.Sum256(kv.Value)
+		i.unseen[keyH] = true
+		i.keyHashToKey[keyH] = kv.Key
+		if i.recordValues {
+			i.keyHashToValue[keyH] = kv.Value
+		}
 	}
 
-	i.hashes[keyH] = sha256.Sum256(kv.Value)
-	i.unseen[keyH] = true
-	i.keyHashToKey[keyH] = kv.Key
-	if i.recordValues {
-		i.keyHashToValue[keyH] = kv.Value
+	if resumeKey != nil {
+		i.resumeKey = <-resumeKey
 	}
+
 	return
 }
 

@@ -11,7 +11,7 @@ const (
 	hashLen  = hashBits / 8
 )
 
-type hash [hashLen]byte
+type hash = murmur3.Hash128
 
 // store the original key at 'k'+hash
 func dbKeyKey(keyH gohash.Hash) []byte {
@@ -23,7 +23,7 @@ func dbValueHashKey(keyH gohash.Hash) []byte {
 	return keyH.Sum(append(make([]byte, 0, 1+hashLen), 'v'))
 }
 
-func hashOf(data []byte) gohash.Hash {
+func hashOf(data []byte) hash {
 	h := murmur3.New128()
 	h.Write(data)
 	return h
