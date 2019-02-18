@@ -1,4 +1,4 @@
-module isi.nc/go/sync2kafka
+module isi.nc/common/sync2kafka
 
 require (
 	github.com/Shopify/sarama v1.20.1
