@@ -1,4 +1,4 @@
 build:
     tags:
-    - ci-general
+    - isi-general
     script: dockerize
