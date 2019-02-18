@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"log"
 	"net"
 	"sync"
@@ -10,6 +11,8 @@ import (
 )
 
 const kvBufferSize = 1000
+
+var token = flag.String("token", "", "Require a token to operate")
 
 type KeyValue = kafkasync.KeyValue
 type SyncStats = kafkasync.Stats
@@ -20,6 +23,9 @@ type SyncInitInfo struct {
 
 	// DoDelete makes the sync delete unseen keys. No deletions if false (the default case).
 	DoDelete bool `json:"doDelete"`
+
+	// Token for authn
+	Token string `json:"token"`
 }
 
 type SyncResult struct {
@@ -50,6 +56,11 @@ func handleConn(conn net.Conn) {
 	init := &SyncInitInfo{}
 	if err := dec.Decode(init); err != nil {
 		log.Print("failed to read init object: ", err)
+		return
+	}
+
+	if init.Token != *token {
+		log.Print("authentication failed: wrong token")
 		return
 	}
 
