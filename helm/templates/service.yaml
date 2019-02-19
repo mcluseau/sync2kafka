@@ -11,6 +11,7 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
+      targetPort: 9084
       protocol: TCP
       name: sync
   selector:

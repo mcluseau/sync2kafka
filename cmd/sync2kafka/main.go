@@ -10,7 +10,7 @@ import (
 var (
 	tlsKeyPath  = flag.String("tls-key", "", "TLS key path (listen with TLS encryption if set)")
 	tlsCertPath = flag.String("tls-cert", "", "TLS certificate path (required if key is set)")
-	bindSpec    = flag.String("bind", ":8080", "Listen specification (host:port)")
+	bindSpec    = flag.String("bind", ":9084", "Listen specification (host:port)")
 )
 
 func main() {
@@ -20,7 +20,9 @@ func main() {
 	setupStore()
 	setupKafka()
 
-	indexTopic(*targetTopic)
+	if len(*targetTopic) != 0 {
+		indexTopic(*targetTopic)
+	}
 
 	var listener net.Listener
 

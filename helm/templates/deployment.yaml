@@ -30,7 +30,6 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
-          - -bind=:{{.Values.service.port}}
           - -token={{.Values.token}}
           - -store=/data/sync2kafka.bolt
 {{- if .Values.targetTopic }}
