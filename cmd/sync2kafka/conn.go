@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -32,20 +33,22 @@ type BinaryKV = client.BinaryKV
 func handleConn(conn net.Conn) {
 	defer conn.Close()
 
-	log.Print("new connection from ", conn.RemoteAddr().String())
-	defer log.Print("closed connection from ", conn.RemoteAddr().String())
+	logPrefix := fmt.Sprintf("from %v: ", conn.RemoteAddr().String())
+
+	log.Print(logPrefix, "new connection")
+	defer log.Print(logPrefix, "closed connection")
 
 	enc := json.NewEncoder(conn)
 	dec := json.NewDecoder(conn)
 
 	init := &SyncInitInfo{}
 	if err := dec.Decode(init); err != nil {
-		log.Print("failed to read init object: ", err)
+		log.Print(logPrefix, "failed to read init object: ", err)
 		return
 	}
 
 	if init.Token != *token {
-		log.Print("authentication failed: wrong token")
+		log.Print(logPrefix, "authentication failed: wrong token")
 		return
 	}
 
@@ -62,12 +65,14 @@ func handleConn(conn net.Conn) {
 	topic := *targetTopic
 	if len(init.Topic) != 0 {
 		if !isTopicAllowed(init.Topic) {
-			log.Print("rejecting topic %q requested by remote %v", init.Topic, conn.RemoteAddr())
+			log.Print("%srejecting topic %q requested by remote %v", logPrefix, init.Topic)
 			return
 		}
 
 		topic = init.Topic
 	}
+
+	logPrefix += fmt.Sprintf("to topic %q: ", init.Topic)
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -90,7 +95,7 @@ func handleConn(conn net.Conn) {
 		err = readBinaryKVs(dec, kvSource)
 
 	default:
-		log.Print("unknown mode %q, closing connection from %v", init.Format, conn.RemoteAddr())
+		log.Print("%sunknown mode %q, closing connection", logPrefix, init.Format)
 		return
 	}
 

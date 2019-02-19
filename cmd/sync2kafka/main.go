@@ -19,9 +19,10 @@ func main() {
 
 	setupStore()
 	setupKafka()
+	setupHTTP()
 
 	if len(*targetTopic) != 0 {
-		indexTopic(*targetTopic)
+		go indexTopic(*targetTopic)
 	}
 
 	var listener net.Listener
