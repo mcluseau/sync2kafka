@@ -9,5 +9,5 @@ run go install ${p}/cmd/...
 
 # ------------------------------------------------------------------------
 from alpine:3.8
-entrypoint ["json2kafka"]
+entrypoint ["sync2kafka"]
 copy --from=build /go/bin/* /bin/
