@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: dkr.isi/common/sync2kafka
-  tag: 0.2.2
+  tag: 0.2.3
   pullPolicy: IfNotPresent
 
 nameOverride: ""
