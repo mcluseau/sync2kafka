@@ -1,0 +1,18 @@
+{{- if .Values.store }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "sync2kafka.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "sync2kafka.name" . }}
+    helm.sh/chart: {{ include "sync2kafka.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  accessModes:
+  - {{ .Values.store.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.store.capacity }}
+  storageClassName: {{ .Values.store.storageClass |quote }}
+{{- end }}

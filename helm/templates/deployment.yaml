@@ -1,0 +1,76 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ include "sync2kafka.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "sync2kafka.name" . }}
+    helm.sh/chart: {{ include "sync2kafka.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "sync2kafka.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "sync2kafka.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+{{- if .Values.store }}
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+            claimName: {{ include "sync2kafka.fullname" . }}
+{{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+          - -bind=:{{.Values.service.port}}
+          - -token={{.Values.token}}
+          - -store=/data/sync2kafka.bolt
+{{- if .Values.targetTopic }}
+          - -topic={{ .Values.targetTopic |quote }}
+{{- end }}
+{{- if .Values.allowAllTopics }}
+          - -allow-all-topics
+{{- end }}
+{{- if .Values.allowedTopics }}
+          - -allowed-topics-file=/config/allowed-topics.list
+{{- end }}
+{{- if .Values.store }}
+          volumeMounts:
+          - name: data
+            mountPath: /data
+{{- end }}
+          ports:
+            - name: sync2kafka
+              containerPort: {{.Values.service.port}}
+              protocol: TCP
+          # TODO TCP probe
+          #livenessProbe:
+          #  httpGet:
+          #    path: /
+          #    port: http
+          #readinessProbe:
+          #  httpGet:
+          #    path: /
+          #    port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
