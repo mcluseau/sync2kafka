@@ -8,6 +8,7 @@ require (
 	github.com/go-openapi/spec v0.18.0 // indirect
 	github.com/json-iterator/go v1.1.5 // indirect
 	github.com/mcluseau/go-diff v0.0.0-20190218055646-1596c2d9945b
+	github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd
 	github.com/mcluseau/kafka-sync v0.0.0-20190218055715-c96a05330a7a
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect

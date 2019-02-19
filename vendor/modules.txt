@@ -29,10 +29,20 @@ github.com/go-openapi/jsonreference
 github.com/go-openapi/spec
 # github.com/go-openapi/swag v0.17.0
 github.com/go-openapi/swag
+# github.com/gobuffalo/envy v1.6.12
+github.com/gobuffalo/envy
+# github.com/gobuffalo/packd v0.0.0-20181212173646-eca3b8fd6687
+github.com/gobuffalo/packd
+# github.com/gobuffalo/packr v1.22.0
+github.com/gobuffalo/packr
+# github.com/gobuffalo/syncx v0.0.0-20181120194010-558ac7de985f
+github.com/gobuffalo/syncx
 # github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 github.com/golang/glog
 # github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 github.com/golang/snappy
+# github.com/joho/godotenv v1.3.0
+github.com/joho/godotenv
 # github.com/json-iterator/go v1.1.5
 github.com/json-iterator/go
 # github.com/mailru/easyjson v0.0.0-20180823135443-60711f1a8329
@@ -42,6 +52,8 @@ github.com/mailru/easyjson/buffer
 # github.com/mcluseau/go-diff v0.0.0-20190218055646-1596c2d9945b
 github.com/mcluseau/go-diff
 github.com/mcluseau/go-diff/boltindex
+# github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd
+github.com/mcluseau/go-swagger-ui
 # github.com/mcluseau/kafka-sync v0.0.0-20190218055715-c96a05330a7a
 github.com/mcluseau/kafka-sync
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
@@ -53,11 +65,17 @@ github.com/oklog/ulid
 # github.com/pierrec/lz4 v2.0.5+incompatible
 github.com/pierrec/lz4
 github.com/pierrec/lz4/internal/xxh32
+# github.com/pkg/errors v0.8.1
+github.com/pkg/errors
 # github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a
 github.com/rcrowley/go-metrics
+# github.com/rogpeppe/go-internal v1.1.0
+github.com/rogpeppe/go-internal/modfile
+github.com/rogpeppe/go-internal/module
+github.com/rogpeppe/go-internal/semver
 # github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72
 github.com/spaolacci/murmur3
-# golang.org/x/net v0.0.0-20181005035420-146acd28ed58
+# golang.org/x/net v0.0.0-20181220203305-927f97764cc3
 golang.org/x/net/idna
 # golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a
 golang.org/x/sys/unix
@@ -67,5 +85,5 @@ golang.org/x/text/width
 golang.org/x/text/secure/bidirule
 golang.org/x/text/unicode/bidi
 golang.org/x/text/transform
-# gopkg.in/yaml.v2 v2.2.1
+# gopkg.in/yaml.v2 v2.2.2
 gopkg.in/yaml.v2

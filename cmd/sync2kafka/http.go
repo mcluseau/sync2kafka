@@ -12,6 +12,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	restful "github.com/emicklei/go-restful"
+	swaggerui "github.com/mcluseau/go-swagger-ui"
 
 	"isi.nc/common/sync2kafka/apiutils"
 )
@@ -36,6 +37,8 @@ func setupHTTP() {
 
 		restful.Add(ws)
 	})
+
+	swaggerui.HandleAt("/swagger-ui/")
 
 	go func() {
 		var err error
