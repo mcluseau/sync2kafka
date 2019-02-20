@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"runtime"
 	"sync"
 
 	kafkasync "github.com/mcluseau/kafka-sync"
@@ -31,12 +32,20 @@ type JsonKV = client.JsonKV
 type BinaryKV = client.BinaryKV
 
 func handleConn(conn net.Conn) {
-	defer conn.Close()
+	logPrefix := fmt.Sprintf("from %v: ", conn.RemoteAddr().String())
+
+	defer func() {
+		conn.Close()
+
+		if err := recover(); err != nil {
+			buf := make([]byte, 64*1024)
+			runtime.Stack(buf, false)
+			log.Print(logPrefix, "panic: ", err, "\n", string(buf))
+		}
+	}()
 
 	status := newConnStatus(conn)
 	defer status.Finished()
-
-	logPrefix := fmt.Sprintf("from %v: ", conn.RemoteAddr().String())
 
 	log.Print(logPrefix, "new connection")
 	defer log.Print(logPrefix, "closed connection")
