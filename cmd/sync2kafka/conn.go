@@ -113,7 +113,7 @@ func handleConn(conn net.Conn) {
 	}
 
 	if err != nil {
-		log.Print("failed to read values from %v: %v", conn.RemoteAddr(), err)
+		log.Printf("%sfailed to read values from %v: %v", logPrefix, conn.RemoteAddr(), err)
 		return
 	}
 
