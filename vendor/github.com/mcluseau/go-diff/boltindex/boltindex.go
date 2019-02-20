@@ -2,6 +2,7 @@ package boltindex
 
 import (
 	"bytes"
+	"fmt"
 	"sync"
 
 	"github.com/boltdb/bolt"
@@ -180,6 +181,10 @@ func (i *Index) writeSeen() {
 		glog.V(5).Infof("boltindex: seen batch: %d entries", len(batch))
 		err = i.db.Update(func(tx *bolt.Tx) (err error) {
 			bucket := tx.Bucket(i.seenBucketName)
+
+			if bucket == nil {
+				return fmt.Errorf("bucket %q has disappeared", string(i.seenBucketName))
+			}
 
 			for _, h := range batch {
 				bucket.Put(h.Sum(nil), []byte{})

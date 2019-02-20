@@ -30,9 +30,9 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.7.0 // indirect
 	github.com/json-iterator/go v1.1.5 // indirect
 	github.com/kisielk/errcheck v1.2.0 // indirect
-	github.com/mcluseau/go-diff v0.0.0-20190220015336-451c607074ca
+	github.com/mcluseau/go-diff v0.0.0-20190220035710-0d331bd0c14c
 	github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd
-	github.com/mcluseau/kafka-sync v0.0.0-20190220015446-03b209c2cd3b
+	github.com/mcluseau/kafka-sync v0.0.0-20190220035751-ccb7c8ccea20
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/openzipkin/zipkin-go v0.1.5 // indirect

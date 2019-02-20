@@ -49,12 +49,12 @@ github.com/json-iterator/go
 github.com/mailru/easyjson/jlexer
 github.com/mailru/easyjson/jwriter
 github.com/mailru/easyjson/buffer
-# github.com/mcluseau/go-diff v0.0.0-20190220015336-451c607074ca
+# github.com/mcluseau/go-diff v0.0.0-20190220035710-0d331bd0c14c
 github.com/mcluseau/go-diff
 github.com/mcluseau/go-diff/boltindex
 # github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd
 github.com/mcluseau/go-swagger-ui
-# github.com/mcluseau/kafka-sync v0.0.0-20190220015446-03b209c2cd3b
+# github.com/mcluseau/kafka-sync v0.0.0-20190220035751-ccb7c8ccea20
 github.com/mcluseau/kafka-sync
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
 github.com/modern-go/concurrent

@@ -503,6 +503,8 @@ github.com/mcluseau/go-diff v0.0.0-20190218055646-1596c2d9945b h1:FX8yz2n/ty4SPl
 github.com/mcluseau/go-diff v0.0.0-20190218055646-1596c2d9945b/go.mod h1:Dh8bN8I/kRrC1IYQaBMqyC5gp3bXqXstptmgwpw+kjw=
 github.com/mcluseau/go-diff v0.0.0-20190220015336-451c607074ca h1:a+A6rxKS8dq68M5kvcXtCj9SAjXLeCVoX8ruxdS2ADI=
 github.com/mcluseau/go-diff v0.0.0-20190220015336-451c607074ca/go.mod h1:Dh8bN8I/kRrC1IYQaBMqyC5gp3bXqXstptmgwpw+kjw=
+github.com/mcluseau/go-diff v0.0.0-20190220035710-0d331bd0c14c h1:oOEIx3RVo5e7GWDgGf6pWF9Rcr5Jpr+F4P3QlvOD2Mg=
+github.com/mcluseau/go-diff v0.0.0-20190220035710-0d331bd0c14c/go.mod h1:Dh8bN8I/kRrC1IYQaBMqyC5gp3bXqXstptmgwpw+kjw=
 github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd h1:xG/m6T6l0b9UDuEiuGMHr2RyjwbQH/P6Lsk2ohQsXls=
 github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd/go.mod h1:OllM1HVcFzek2effrrgC8BLKfG73mSKfrh41kEuhvMk=
 github.com/mcluseau/kafka-sync v0.0.0-20180212005405-9c9d18e48b85 h1:oSB8tWTsbOfnP9iWnbPIhd7k3gAuq2S5MYzPTCEedUg=
@@ -553,6 +555,8 @@ github.com/mcluseau/kafka-sync v0.0.0-20190218055715-c96a05330a7a h1:98CCmxSwDgS
 github.com/mcluseau/kafka-sync v0.0.0-20190218055715-c96a05330a7a/go.mod h1:0y7AoqU22bvOm6SnP2fXpnZIyi3mK769odyN751eG2Y=
 github.com/mcluseau/kafka-sync v0.0.0-20190220015446-03b209c2cd3b h1:XvldFVoH2lAnB2wxQBq5bnC2YZ0BPzgmsabwcnYOHd0=
 github.com/mcluseau/kafka-sync v0.0.0-20190220015446-03b209c2cd3b/go.mod h1:474OGwWriRs8Y2QupiTsa8NGyuGAynW7tNb8LIfPs1o=
+github.com/mcluseau/kafka-sync v0.0.0-20190220035751-ccb7c8ccea20 h1:ManG4YzUnc/eAov1orGDKOlp3ObFr1CudxAhYxNMlAE=
+github.com/mcluseau/kafka-sync v0.0.0-20190220035751-ccb7c8ccea20/go.mod h1:a1Ns2ZHofQGEotsB06kz6d735N1ZsiSteJJL+A2I32E=
 github.com/microcosm-cc/bluemonday v1.0.1/go.mod h1:hsXNsILzKxV+sX77C5b8FSuKF00vh2OMYv+xgHpAMF4=
 github.com/microcosm-cc/bluemonday v1.0.2/go.mod h1:iVP4YcDBq+n/5fb23BhYFvIMq/leAFZyRl6bYmGDlGc=
 github.com/mitchellh/go-homedir v1.0.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
