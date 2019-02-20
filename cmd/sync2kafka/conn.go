@@ -117,18 +117,18 @@ func handleConn(conn net.Conn) {
 		return
 	}
 
-	log.Print("finished reading values")
+	log.Print(logPrefix, "finished reading values")
 	close(kvSource)
 
 	status.Status = "finializing"
 	wg.Wait()
 
-	log.Printf("sync stats: %+v", status.SyncStats)
+	log.Printf(logPrefix, "sync stats: %+v", status.SyncStats)
 
 	if syncErr != nil {
 		enc.Encode(SyncResult{false})
 
-		log.Print("sync failed: ", syncErr)
+		log.Print(logPrefix, "sync failed: ", syncErr)
 		return
 	}
 

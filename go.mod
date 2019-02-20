@@ -67,5 +67,6 @@ require (
 	google.golang.org/genproto v0.0.0-20190219182410-082222b4a5c5 // indirect
 	google.golang.org/grpc v1.18.0 // indirect
 	honnef.co/go/tools v0.0.0-20190215041234-466a0476246c // indirect
+	isi.nc/go/lib v0.0.0-20190220034620-92988a693394 // indirect
 	sourcegraph.com/sqs/pbtypes v1.0.0 // indirect
 )
