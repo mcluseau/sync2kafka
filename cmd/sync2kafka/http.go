@@ -81,12 +81,16 @@ func (a *storeAPI) Register(ws *restful.WebService) {
 	ws.Route(ws.GET("/store/stats").To(a.Stats))
 	ws.Route(ws.POST("/store/cleanup").To(a.Cleanup))
 
-	ws.Route(ws.GET("/store/buckets").To(a.ListBuckets))
-	ws.Route(ws.GET("/store/buckets/{bucket-name}").To(a.GetBucket))
-	ws.Route(ws.DELETE("/store/buckets/{bucket-name}").To(a.DeleteBucket))
+	bucketParam := ws.PathParameter("bucket-name", "Name of the bucket")
 
-	ws.Route(ws.GET("/store/buckets/{bucket-name}/dump").To(a.DumpBucket).Produces("application/x-jsonlines"))
-	ws.Route(ws.POST("/store/buckets/{bucket-name}/load").To(a.LoadBucket).Consumes("application/x-jsonlines"))
+	ws.Route(ws.GET("/store/buckets").To(a.ListBuckets))
+	ws.Route(ws.GET("/store/buckets/{bucket-name}").To(a.GetBucket).Param(bucketParam))
+	ws.Route(ws.DELETE("/store/buckets/{bucket-name}").To(a.DeleteBucket).Param(bucketParam))
+
+	ws.Route(ws.GET("/store/buckets/{bucket-name}/dump").To(a.DumpBucket).Param(bucketParam).
+		Produces("application/x-jsonlines"))
+	ws.Route(ws.POST("/store/buckets/{bucket-name}/load").To(a.LoadBucket).Param(bucketParam).
+		Consumes("application/x-jsonlines"))
 }
 
 func (a *storeAPI) fail(req *restful.Request, res *restful.Response, err error) {
