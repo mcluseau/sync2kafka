@@ -29,7 +29,10 @@ func setupHTTP() {
 		ws := &restful.WebService{}
 		ws.Produces(restful.MIME_JSON)
 
-		ws.Filter(authFilter)
+		if len(*httpToken) != 0 {
+			ws.Param(ws.HeaderParameter("Authorization", "Bearer token for authentication").Required(true))
+			ws.Filter(authFilter)
+		}
 
 		if hasStore {
 			(&storeAPI{}).Register(ws)
