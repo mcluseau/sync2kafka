@@ -1,4 +1,17 @@
+stages:
+  - build
+  - helm
+
 build:
+    stage: build
     tags:
     - isi-general
     script: dockerize
+
+helm:
+    stage: helm
+    image: dkr.isi/helm/helm-runner:v0.9
+    tags:
+    - ci-kubernetes
+    script:
+    - chartify
