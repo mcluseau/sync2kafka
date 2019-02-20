@@ -21,6 +21,8 @@ func main() {
 	setupKafka()
 	setupHTTP()
 
+	go connStatusCleaner()
+
 	if len(*targetTopic) != 0 {
 		go indexTopic(*targetTopic)
 	}

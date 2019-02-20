@@ -33,6 +33,9 @@ type BinaryKV = client.BinaryKV
 func handleConn(conn net.Conn) {
 	defer conn.Close()
 
+	status := newConnStatus(conn)
+	defer status.Finished()
+
 	logPrefix := fmt.Sprintf("from %v: ", conn.RemoteAddr().String())
 
 	log.Print(logPrefix, "new connection")
@@ -54,11 +57,6 @@ func handleConn(conn net.Conn) {
 
 	kvSource := make(chan KeyValue, kvBufferSize)
 
-	var (
-		syncStats *SyncStats
-		syncErr   error
-	)
-
 	cancel := make(chan bool, 1)
 	defer close(cancel)
 
@@ -72,13 +70,17 @@ func handleConn(conn net.Conn) {
 		topic = init.Topic
 	}
 
+	status.TargetTopic = topic
 	logPrefix += fmt.Sprintf("to topic %q: ", init.Topic)
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)
+
+	var syncErr error
+
 	go func() {
 		defer wg.Done()
-		syncStats, syncErr = (&syncSpec{
+		status.SyncStats, syncErr = (&syncSpec{
 			Source:      kvSource,
 			TargetTopic: topic,
 			DoDelete:    init.DoDelete,
@@ -86,13 +88,15 @@ func handleConn(conn net.Conn) {
 		}).sync()
 	}()
 
+	status.Status = "reading data"
+
 	var err error
 	switch init.Format {
 	case "json":
-		err = readJsonKVs(dec, kvSource)
+		err = readJsonKVs(dec, kvSource, status)
 
 	case "binary":
-		err = readBinaryKVs(dec, kvSource)
+		err = readBinaryKVs(dec, kvSource, status)
 
 	default:
 		log.Print("%sunknown mode %q, closing connection", logPrefix, init.Format)
@@ -106,9 +110,11 @@ func handleConn(conn net.Conn) {
 
 	log.Print("finished reading values")
 	close(kvSource)
+
+	status.Status = "finializing"
 	wg.Wait()
 
-	log.Printf("sync stats: %+v", syncStats)
+	log.Printf("sync stats: %+v", status.SyncStats)
 
 	if syncErr != nil {
 		enc.Encode(SyncResult{false})
@@ -120,7 +126,7 @@ func handleConn(conn net.Conn) {
 	enc.Encode(SyncResult{true})
 }
 
-func readJsonKVs(dec *json.Decoder, out chan KeyValue) error {
+func readJsonKVs(dec *json.Decoder, out chan KeyValue, status *ConnStatus) error {
 	for {
 		obj := JsonKV{}
 		if err := dec.Decode(&obj); err != nil {
@@ -131,6 +137,8 @@ func readJsonKVs(dec *json.Decoder, out chan KeyValue) error {
 			return nil
 		}
 
+		status.ItemsRead++
+
 		out <- KeyValue{
 			Key:   *obj.Key,
 			Value: *obj.Value,
@@ -138,7 +146,7 @@ func readJsonKVs(dec *json.Decoder, out chan KeyValue) error {
 	}
 }
 
-func readBinaryKVs(dec *json.Decoder, out chan KeyValue) error {
+func readBinaryKVs(dec *json.Decoder, out chan KeyValue, status *ConnStatus) error {
 	for {
 		obj := BinaryKV{}
 		if err := dec.Decode(&obj); err != nil {
@@ -148,6 +156,8 @@ func readBinaryKVs(dec *json.Decoder, out chan KeyValue) error {
 		if obj.EndOfTransfer {
 			return nil
 		}
+
+		status.ItemsRead++
 
 		out <- KeyValue{
 			Key:   obj.Key,
