@@ -43,8 +43,7 @@ func New(db *bolt.DB, bucket []byte, recordSeen bool) (idx *Index, err error) {
 		}
 
 		if recordSeen {
-			ulid := newUlid()
-			seenBucketName = append(seenPrefix, ulid[:]...)
+			seenBucketName = append(seenPrefix, []byte(newUlid().String())...)
 
 			if _, err = tx.CreateBucket(seenBucketName); err != nil {
 				return

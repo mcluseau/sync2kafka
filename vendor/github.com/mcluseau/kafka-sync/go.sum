@@ -11,6 +11,8 @@ github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21/go.mod h1
 github.com/eapache/queue v1.1.0/go.mod h1:6eCeP0CKFpHLu8blIFXhExK/dRa7WDZfr6jVFPTqq+I=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
 github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
+github.com/golang/snappy v0.0.1 h1:Qgr9rKW7uDUkrbSmQeiDsGa8SjGyCOGtuasMWwvp2P4=
+github.com/golang/snappy v0.0.1/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/mcluseau/go-diff v0.0.0-20170912074617-100286016ffb h1:jMnxJla+ExVW1PhJGJgp9il0FaPa4yaWWpRBkHMalnE=
 github.com/mcluseau/go-diff v0.0.0-20170912074617-100286016ffb/go.mod h1:ngKKa6Uw+/H/qY1yXddTTWMnNeywcau3+ZJEZkBovY0=
 github.com/mcluseau/go-diff v0.0.0-20190215075103-f7373f1a0c48 h1:VEk2dXaTSSnDACWp07xL3eySu5s89KtgZqGNxQ3KFE4=
@@ -45,6 +47,8 @@ github.com/mcluseau/go-diff v0.0.0-20190218023921-9c316fb186c9 h1:WmrcqmOZ40AKto
 github.com/mcluseau/go-diff v0.0.0-20190218023921-9c316fb186c9/go.mod h1:0mOslDFEA5LkBGDY4lHwPUOmZwpSANkV3qrqrA/jjcc=
 github.com/mcluseau/go-diff v0.0.0-20190218055646-1596c2d9945b h1:FX8yz2n/ty4SPlP+IzGeJYv+Jsz0iamUoZepgxE+0fE=
 github.com/mcluseau/go-diff v0.0.0-20190218055646-1596c2d9945b/go.mod h1:Dh8bN8I/kRrC1IYQaBMqyC5gp3bXqXstptmgwpw+kjw=
+github.com/mcluseau/go-diff v0.0.0-20190220015336-451c607074ca h1:a+A6rxKS8dq68M5kvcXtCj9SAjXLeCVoX8ruxdS2ADI=
+github.com/mcluseau/go-diff v0.0.0-20190220015336-451c607074ca/go.mod h1:Dh8bN8I/kRrC1IYQaBMqyC5gp3bXqXstptmgwpw+kjw=
 github.com/mcluseau/kafka-sync v0.0.0-20190217062914-bf952ff087bb/go.mod h1:J8Wuc/mWmlYiCSnr5wcrA6sN+s6Le0hty1VgmXI2G/M=
 github.com/mcluseau/kafka-sync v0.0.0-20190218023944-6df3e633d270/go.mod h1:cB4W7u1RzJzPjToU5bipAEC9SsG2yIMU1zrGsWxcJY0=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
