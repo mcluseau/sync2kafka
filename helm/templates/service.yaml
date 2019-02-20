@@ -12,8 +12,14 @@ spec:
   ports:
     - port: {{ .Values.service.port }}
       targetPort: 9084
-      protocol: TCP
       name: sync
+{{- if .tlsSecret }}
+    - port: 443
+      name: https
+{{- else }}
+    - port: 80
+      name: http
+{{- end }}
   selector:
     app.kubernetes.io/name: {{ include "sync2kafka.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

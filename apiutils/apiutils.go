@@ -1,6 +1,8 @@
 package apiutils
 
 import (
+	"net/http"
+
 	"github.com/emicklei/go-restful"
 	restfulspec "github.com/emicklei/go-restful-openapi"
 )
@@ -24,7 +26,7 @@ func Setup(addWebServices func()) {
 }
 
 func SetupHealth() {
-	// TODO
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("ok")) })
 }
 
 // SetupOpenAPI creates the standard API documentation endpoint at the default location.

@@ -5,7 +5,7 @@ require (
 	github.com/boltdb/bolt v1.3.1
 	github.com/emicklei/go-restful v2.9.0+incompatible
 	github.com/emicklei/go-restful-openapi v1.0.0
-	github.com/go-openapi/spec v0.18.0 // indirect
+	github.com/go-openapi/spec v0.18.0
 	github.com/json-iterator/go v1.1.5 // indirect
 	github.com/mcluseau/go-diff v0.0.0-20190218055646-1596c2d9945b
 	github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd

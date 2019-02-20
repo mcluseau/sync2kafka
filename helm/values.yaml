@@ -13,6 +13,9 @@ nameOverride: ""
 fullnameOverride: ""
 
 token: YahB2aicook7ujai
+httpToken: dav9ao8chahKeshi
+
+tlsSecret: ""
 
 store:
     storageClass: ""

@@ -19,21 +19,36 @@ spec:
         app.kubernetes.io/name: {{ include "sync2kafka.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-{{- if .Values.store }}
+{{- if or .Values.store .Values.tlsSecret }}
       volumes:
+{{-   if .Values.store }}
+{{-   end }}
       - name: data
         persistentVolumeClaim:
             claimName: {{ include "sync2kafka.fullname" . }}
+{{-   if .Values.tlsSecret }}
+      - name: tls
+        secret:
+            secretName: {{ .Values.tlsSecret }}
+{{-   end }}
 {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
-          - -token={{.Values.token}}
           - -store=/data/sync2kafka.bolt
+          - -token={{.Values.token}}
+{{- if .Values.tlsSecret }}
+          - -tls-key=/tls/tls.key
+          - -tls-cert=/tls/tls.crt
+          - -http-bind=:443
+{{- else }}
+          - -http-bind=:80
+{{- end }}
+          - -http-token={{.Values.httpToken}}
 {{- if .Values.targetTopic }}
-          - -topic={{ .Values.targetTopic |quote }}
+          - -topic={{ .Values.targetTopic }}
 {{- end }}
 {{- if .Values.allowAllTopics }}
           - -allow-all-topics
@@ -41,24 +56,42 @@ spec:
 {{- if .Values.allowedTopics }}
           - -allowed-topics-file=/config/allowed-topics.list
 {{- end }}
-{{- if .Values.store }}
+{{- if or .Values.store .Values.tlsSecret }}
           volumeMounts:
+{{-   if .Values.store }}
           - name: data
             mountPath: /data
+{{-   end }}
+{{-   if .Values.tlsSecret }}
+          - name: tls
+            mountPath: /tls
+{{-   end }}
 {{- end }}
           ports:
             - name: sync2kafka
               containerPort: {{.Values.service.port}}
               protocol: TCP
-          # TODO TCP probe
-          #livenessProbe:
-          #  httpGet:
-          #    path: /
-          #    port: http
-          #readinessProbe:
-          #  httpGet:
-          #    path: /
-          #    port: http
+{{- if .Values.tlsSecret }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 443
+              scheme: HTTPS
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 443
+              scheme: HTTPS
+{{- else }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+{{- end }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
