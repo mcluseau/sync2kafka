@@ -97,6 +97,8 @@ func (a *storeAPI) Cleanup(req *restful.Request, res *restful.Response) {
 				return nil
 			}
 
+			name = append(make([]byte, 0, len(name)), name...)
+
 			id, err := ulid.Parse(string(name[len(seenPrefix):]))
 			if err != nil {
 				log.Printf("failed to parse ULID for bucket %q, it will be removed", string(name))
