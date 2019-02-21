@@ -123,7 +123,7 @@ func handleConn(conn net.Conn) {
 	status.Status = "finializing"
 	wg.Wait()
 
-	log.Printf(logPrefix, "sync stats: %+v", status.SyncStats)
+	log.Printf("%ssync stats: %+v", logPrefix, status.SyncStats)
 
 	if syncErr != nil {
 		enc.Encode(SyncResult{false})
