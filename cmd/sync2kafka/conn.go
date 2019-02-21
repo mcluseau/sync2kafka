@@ -72,7 +72,7 @@ func handleConn(conn net.Conn) {
 	topic := *targetTopic
 	if len(init.Topic) != 0 {
 		if !isTopicAllowed(init.Topic) {
-			log.Print("%srejecting topic %q requested by remote %v", logPrefix, init.Topic)
+			log.Printf("%srejecting topic %q", logPrefix, init.Topic)
 			return
 		}
 
@@ -108,7 +108,7 @@ func handleConn(conn net.Conn) {
 		err = readBinaryKVs(dec, kvSource, status)
 
 	default:
-		log.Print("%sunknown mode %q, closing connection", logPrefix, init.Format)
+		log.Printf("%sunknown mode %q, closing connection", logPrefix, init.Format)
 		return
 	}
 
