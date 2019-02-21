@@ -8,9 +8,11 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/boltdb/bolt"
 	restful "github.com/emicklei/go-restful"
+	"github.com/oklog/ulid"
 )
 
 type storeAPI struct{}
@@ -87,13 +89,25 @@ func (a *storeAPI) Cleanup(req *restful.Request, res *restful.Response) {
 	bucketsToClean := make([][]byte, 0)
 
 	// collect buckets to clean
+	now := time.Now()
+
 	err := db.View(func(tx *bolt.Tx) error {
 		return tx.ForEach(func(name []byte, b *bolt.Bucket) (err error) {
 			if !bytes.HasPrefix(name, seenPrefix) {
 				return
 			}
 
-			bucketsToClean = append(bucketsToClean, name)
+			id, err := ulid.Parse(string(name[len(seenPrefix):]))
+			if err != nil {
+				log.Printf("failed to parse ULID for bucket %q, it will be removed", string(name))
+				bucketsToClean = append(bucketsToClean, name)
+				return
+			}
+
+			if now.Sub(ulid.Time(id.Time())).Hours() >= 24 {
+				bucketsToClean = append(bucketsToClean, name)
+			}
+
 			return
 		})
 	})
