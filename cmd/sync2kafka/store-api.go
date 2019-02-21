@@ -92,28 +92,29 @@ func (a *storeAPI) Cleanup(req *restful.Request, res *restful.Response) {
 	now := time.Now()
 
 	err := db.View(func(tx *bolt.Tx) error {
-		return tx.ForEach(func(name []byte, b *bolt.Bucket) (err error) {
+		return tx.ForEach(func(name []byte, b *bolt.Bucket) error {
 			if !bytes.HasPrefix(name, seenPrefix) {
-				return
+				return nil
 			}
 
 			id, err := ulid.Parse(string(name[len(seenPrefix):]))
 			if err != nil {
 				log.Printf("failed to parse ULID for bucket %q, it will be removed", string(name))
 				bucketsToClean = append(bucketsToClean, name)
-				return
+				return nil
 			}
 
 			if now.Sub(ulid.Time(id.Time())).Hours() >= 24 {
 				bucketsToClean = append(bucketsToClean, name)
 			}
 
-			return
+			return nil
 		})
 	})
 
 	if err != nil {
 		a.fail(req, res, err)
+		return
 	}
 
 	// and clean them up
@@ -122,7 +123,10 @@ func (a *storeAPI) Cleanup(req *restful.Request, res *restful.Response) {
 		err := db.Update(func(tx *bolt.Tx) error {
 			return tx.DeleteBucket(name)
 		})
-		log.Printf("store API: cleanup: removing bucket %q failed: %v", string(name), err)
+
+		if err != nil {
+			log.Printf("store API: cleanup: removing bucket %q failed: %v", string(name), err)
+		}
 	}
 }
 
