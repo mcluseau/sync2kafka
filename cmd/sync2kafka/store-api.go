@@ -84,27 +84,31 @@ func (a *storeAPI) Stats(req *restful.Request, res *restful.Response) {
 var seenPrefix = []byte("seen:")
 
 func (a *storeAPI) Cleanup(req *restful.Request, res *restful.Response) {
-	err := db.Update(func(tx *bolt.Tx) error {
+	bucketsToClean := make([][]byte, 0)
+
+	// collect buckets to clean
+	err := db.View(func(tx *bolt.Tx) error {
 		return tx.ForEach(func(name []byte, b *bolt.Bucket) (err error) {
 			if !bytes.HasPrefix(name, seenPrefix) {
 				return
 			}
 
-			// seen bucket
-			stats := b.Stats()
-
-			if stats.BranchInuse > 0 ||
-				stats.LeafInuse > 0 {
-				return // bucket in use
-			}
-
-			log.Printf("store API: cleanup: removing bucket %q", string(name))
-			return tx.DeleteBucket(name)
+			bucketsToClean = append(bucketsToClean, name)
+			return
 		})
 	})
 
 	if err != nil {
 		a.fail(req, res, err)
+	}
+
+	// and clean them up
+	for _, name := range bucketsToClean {
+		log.Printf("store API: cleanup: removing bucket %q", string(name))
+		err := db.Update(func(tx *bolt.Tx) error {
+			return tx.DeleteBucket(name)
+		})
+		log.Printf("store API: cleanup: removing bucket %q failed: %v", string(name), err)
 	}
 }
 
