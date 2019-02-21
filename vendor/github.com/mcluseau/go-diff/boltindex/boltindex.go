@@ -73,11 +73,10 @@ var _ diff.Index = &Index{}
 func (i *Index) Cleanup() (err error) {
 	if i.seenBucketName != nil {
 		err = i.db.Update(func(tx *bolt.Tx) (err error) {
-			tx.DeleteBucket(i.seenBucketName)
 			tx.OnCommit(func() {
 				i.seenBucketName = nil
 			})
-			return
+			return tx.DeleteBucket(i.seenBucketName)
 		})
 		if err != nil {
 			return
