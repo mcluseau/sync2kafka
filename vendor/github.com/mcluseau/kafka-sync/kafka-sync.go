@@ -74,6 +74,16 @@ func (s Syncer) SyncWithPrepopulatedIndex(kafka sarama.Client, kvSource <-chan K
 }
 
 func (s Syncer) syncWithPrepopulatedIndex(kafka sarama.Client, kvSource <-chan KeyValue, topicIndex diff.Index, stats *Stats, cancel <-chan bool) (err error) {
+	done := false
+
+	defer func() {
+		if !done {
+			err := topicIndex.Cleanup()
+			if err != nil {
+				glog.V(1).Infof("Cleanup error: %v", err)
+			}
+		}
+	}()
 
 	// Prepare producer
 	send, finish := s.SetupProducer(kafka, stats)
@@ -93,6 +103,9 @@ func (s Syncer) syncWithPrepopulatedIndex(kafka sarama.Client, kvSource <-chan K
 
 	stats.SyncDuration = time.Since(startSyncTime)
 	stats.TotalDuration = stats.Elapsed()
+
+	err = topicIndex.Cleanup()
+	done = true
 
 	return
 }

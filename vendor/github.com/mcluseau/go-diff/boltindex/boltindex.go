@@ -64,6 +64,9 @@ func New(db *bolt.DB, bucket []byte, recordSeen bool) (idx *Index, err error) {
 		seenBucketName: seenBucketName,
 		seenWG:         sync.WaitGroup{},
 	}
+
+	idx.startWriteSeen()
+
 	return
 }
 
@@ -150,12 +153,6 @@ func (i *Index) Compare(kv KeyValue) (result diff.CompareResult, err error) {
 	}
 
 	if i.recordSeen {
-		if i.seenStream == nil {
-			i.seenStream = make(chan hash, seenBatchSize)
-			i.seenWG.Add(1)
-			go i.writeSeen()
-		}
-
 		i.seenStream <- hashOf(kv.Key)
 	}
 
@@ -169,6 +166,12 @@ func (i *Index) Compare(kv KeyValue) (result diff.CompareResult, err error) {
 		return diff.UnchangedKey, nil
 	}
 	return diff.ModifiedKey, nil
+}
+
+func (i *Index) startWriteSeen() {
+	i.seenStream = make(chan hash, seenBatchSize)
+	i.seenWG.Add(1)
+	go i.writeSeen()
 }
 
 func (i *Index) writeSeen() {

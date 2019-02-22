@@ -39,6 +39,11 @@ func NewIndex(recordValues bool) Index {
 	}
 }
 
+func (i *MemoryIndex) Cleanup() (err error) {
+	i.unseen = nil
+	return
+}
+
 func (i *MemoryIndex) Index(kvs <-chan KeyValue, resumeKey <-chan []byte) (err error) {
 	for kv := range kvs {
 		keyH := sha256.Sum256(kv.Key)

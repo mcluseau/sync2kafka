@@ -11,7 +11,7 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20190212144455-93d5ec2c7f76 // indirect
 	github.com/emicklei/go-restful v2.9.0+incompatible
 	github.com/emicklei/go-restful-openapi v1.0.0
-	github.com/gliderlabs/ssh v0.1.2 // indirect
+	github.com/gliderlabs/ssh v0.1.3 // indirect
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/go-openapi/jsonpointer v0.18.0 // indirect
 	github.com/go-openapi/jsonreference v0.18.0 // indirect
@@ -32,9 +32,9 @@ require (
 	github.com/json-iterator/go v1.1.5 // indirect
 	github.com/kisielk/errcheck v1.2.0 // indirect
 	github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f // indirect
-	github.com/mcluseau/go-diff v0.0.0-20190221224215-f7a208157005
+	github.com/mcluseau/go-diff v0.0.0-20190222001419-1861e632692a
 	github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd
-	github.com/mcluseau/kafka-sync v0.0.0-20190221224236-11824e18ea84
+	github.com/mcluseau/kafka-sync v0.0.0-20190222002245-f19a232346e0
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/oklog/ulid v1.3.1

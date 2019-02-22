@@ -11,6 +11,8 @@ type Indexer interface {
 }
 
 type SyncIndex interface {
+	Cleanup() error
+
 	Compare(kv KeyValue) (CompareResult, error)
 	Value(key []byte) []byte
 

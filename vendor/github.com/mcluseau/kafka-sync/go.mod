@@ -4,5 +4,5 @@ require (
 	github.com/Shopify/sarama v1.20.1
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/mcluseau/go-diff v0.0.0-20190221224215-f7a208157005
+	github.com/mcluseau/go-diff v0.0.0-20190222001419-1861e632692a
 )
