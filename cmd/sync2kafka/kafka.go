@@ -10,7 +10,7 @@ import (
 
 var (
 	kafkaBrokers = flag.String("brokers", "kafka:9092", "Kafka brokers, comma separated")
-	targetTopic  = flag.String("topic", "sync2kafka.default", "Kafka topic to synchronize")
+	targetTopic  = flag.String("topic", "", "Kafka topic to synchronize")
 
 	kafka sarama.Client
 )
