@@ -38,7 +38,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
           - -store=/data/sync2kafka.bolt
-          - -token={{.Values.token}}
+          - -token=$(TOKEN)
+          - -http-token=$(HTTP_TOKEN)
 {{- if .Values.tlsSecret }}
           - -tls-key=/tls/tls.key
           - -tls-cert=/tls/tls.crt
@@ -46,7 +47,6 @@ spec:
 {{- else }}
           - -http-bind=:80
 {{- end }}
-          - -http-token={{.Values.httpToken}}
 {{- if .Values.targetTopic }}
           - -topic={{ .Values.targetTopic }}
 {{- end }}
@@ -67,6 +67,17 @@ spec:
             mountPath: /tls
 {{-   end }}
 {{- end }}
+          env:
+          - name: TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "sync2kafka.fullname" . }}
+                key: token
+          - name: HTTP_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "sync2kafka.fullname" . }}
+                key: httpToken
           ports:
             - name: sync2kafka
               containerPort: {{.Values.service.port}}
