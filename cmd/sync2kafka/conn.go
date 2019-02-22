@@ -71,16 +71,27 @@ func handleConn(conn net.Conn) {
 
 	topic := *targetTopic
 	if len(init.Topic) != 0 {
-		if !isTopicAllowed(init.Topic) {
-			log.Printf("%srejecting topic %q", logPrefix, init.Topic)
-			return
-		}
-
 		topic = init.Topic
+	}
+
+	if len(topic) == 0 {
+		log.Printf("%srejecting: no topic specified and no default topic", logPrefix)
+		return
+	}
+
+	if !isTopicAllowed(topic) {
+		log.Printf("%srejecting topic %q", logPrefix, init.Topic)
+		return
 	}
 
 	status.TargetTopic = topic
 	logPrefix += fmt.Sprintf("to topic %q: ", init.Topic)
+
+	if !lockTopic(topic) {
+		log.Print(logPrefix, "rejecting, topic already locked.")
+	}
+
+	defer unlockTopic(topic)
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -123,7 +134,9 @@ func handleConn(conn net.Conn) {
 	status.Status = "finializing"
 	wg.Wait()
 
-	log.Print(logPrefix, "sync stats:\n", status.SyncStats.LogString())
+	if status.SyncStats != nil {
+		log.Print(logPrefix, "sync stats:\n", status.SyncStats.LogString())
+	}
 
 	if syncErr != nil {
 		enc.Encode(SyncResult{false})
