@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"sync"
 
@@ -9,7 +10,10 @@ import (
 )
 
 var (
-	topicLock = sync.Mutex{}
+	indexingTopicsCond = sync.NewCond(&sync.Mutex{})
+	indexingTopics     = map[string]bool{}
+
+	maxIndexings = flag.Int("parallel-indexers", 4, "Maximum parallel indexing operations")
 )
 
 func indexTopic(topic string) (err error) {
@@ -17,8 +21,8 @@ func indexTopic(topic string) (err error) {
 		return
 	}
 
-	topicLock.Lock()
-	defer topicLock.Unlock()
+	lockTopicForIndexing(topic)
+	defer unlockTopicForIndexing(topic)
 
 	index, err := boltindex.New(db, []byte(topic), false)
 	if err != nil {
@@ -41,4 +45,22 @@ func indexTopic(topic string) (err error) {
 	}
 
 	return
+}
+
+func lockTopicForIndexing(topic string) {
+	indexingTopicsCond.L.Lock()
+	for len(indexingTopics) >= *maxIndexings || indexingTopics[topic] {
+		indexingTopicsCond.Wait()
+	}
+
+	indexingTopics[topic] = true
+	indexingTopicsCond.L.Unlock()
+}
+
+func unlockTopicForIndexing(topic string) {
+	indexingTopicsCond.L.Lock()
+	defer indexingTopicsCond.L.Unlock()
+
+	delete(indexingTopics, topic)
+	indexingTopicsCond.Broadcast()
 }
