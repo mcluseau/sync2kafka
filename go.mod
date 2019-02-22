@@ -32,9 +32,9 @@ require (
 	github.com/json-iterator/go v1.1.5 // indirect
 	github.com/kisielk/errcheck v1.2.0 // indirect
 	github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f // indirect
-	github.com/mcluseau/go-diff v0.0.0-20190222001419-1861e632692a
+	github.com/mcluseau/go-diff v1.0.0
 	github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd
-	github.com/mcluseau/kafka-sync v0.0.0-20190222002245-f19a232346e0
+	github.com/mcluseau/kafka-sync v1.0.0
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/oklog/ulid v1.3.1
