@@ -54,7 +54,7 @@ github.com/mcluseau/go-diff
 github.com/mcluseau/go-diff/boltindex
 # github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd
 github.com/mcluseau/go-swagger-ui
-# github.com/mcluseau/kafka-sync v1.0.0
+# github.com/mcluseau/kafka-sync v1.0.1
 github.com/mcluseau/kafka-sync
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
 github.com/modern-go/concurrent

@@ -34,7 +34,7 @@ require (
 	github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f // indirect
 	github.com/mcluseau/go-diff v1.0.0
 	github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd
-	github.com/mcluseau/kafka-sync v1.0.0
+	github.com/mcluseau/kafka-sync v1.0.1
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/oklog/ulid v1.3.1

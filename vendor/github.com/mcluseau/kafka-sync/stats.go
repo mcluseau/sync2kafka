@@ -1,6 +1,8 @@
 package kafkasync
 
 import (
+	"bytes"
+	"fmt"
 	"time"
 
 	"github.com/golang/glog"
@@ -38,18 +40,26 @@ func (stats *Stats) Elapsed() time.Duration {
 	return time.Since(stats.startTime)
 }
 
-func (stats *Stats) Log() {
-	glog.Infof("- %d creations, %d modifications, %d deletions, %d unchanged",
+func (stats *Stats) LogString() string {
+	buf := &bytes.Buffer{}
+
+	fmt.Fprintf(buf, "- %d creations, %d modifications, %d deletions, %d unchanged\n",
 		stats.Created, stats.Modified, stats.Deleted, stats.Unchanged)
-	glog.Infof("- %d active values", stats.Count)
-	glog.Infof("- %d messages sent", stats.SendCount)
+	fmt.Fprintf(buf, "- %d active values\n", stats.Count)
+	fmt.Fprintf(buf, "- %d messages sent\n", stats.SendCount)
 	if stats.SuccessCount >= 0 {
-		glog.Infof("- %d send successes", stats.SuccessCount)
+		fmt.Fprintf(buf, "- %d send successes\n", stats.SuccessCount)
 	}
 	if stats.ErrorCount >= 0 {
-		glog.Infof("- %d send errors", stats.ErrorCount)
+		fmt.Fprintf(buf, "- %d send errors\n", stats.ErrorCount)
 	}
-	glog.Infof("- read:  %s (%d messages)", stats.ReadTopicDuration, stats.MessagesInTopic)
-	glog.Infof("- sync:  %s", stats.SyncDuration)
-	glog.Infof("- total: %s", stats.TotalDuration)
+	fmt.Fprintf(buf, "- read:  %s (%d messages)\n", stats.ReadTopicDuration, stats.MessagesInTopic)
+	fmt.Fprintf(buf, "- sync:  %s\n", stats.SyncDuration)
+	fmt.Fprintf(buf, "- total: %s", stats.TotalDuration)
+
+	return buf.String()
+}
+
+func (stats *Stats) Log() {
+	glog.Info("synchronization status:\n", stats.LogString())
 }

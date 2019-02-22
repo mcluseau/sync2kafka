@@ -582,6 +582,8 @@ github.com/mcluseau/kafka-sync v0.0.0-20190222002245-f19a232346e0 h1:lqAeOVRVjCC
 github.com/mcluseau/kafka-sync v0.0.0-20190222002245-f19a232346e0/go.mod h1:TKuPWwIZjETy4Qa4KNL52PU2cmJA7wp0rSVMhI4fHU4=
 github.com/mcluseau/kafka-sync v1.0.0 h1:l6jKRrdn1Q5IbCrEt5giquUGCZeDnZit9JsF6ot1M+o=
 github.com/mcluseau/kafka-sync v1.0.0/go.mod h1:TKuPWwIZjETy4Qa4KNL52PU2cmJA7wp0rSVMhI4fHU4=
+github.com/mcluseau/kafka-sync v1.0.1 h1:DujkDMgH5PUGH1EjRHwpuPPNBzhainLo5maA2DoKwoY=
+github.com/mcluseau/kafka-sync v1.0.1/go.mod h1:c4mFJKgTJeD5xgJCdLYy8PSOJSszfCEFEadpYT/20bk=
 github.com/microcosm-cc/bluemonday v1.0.1/go.mod h1:hsXNsILzKxV+sX77C5b8FSuKF00vh2OMYv+xgHpAMF4=
 github.com/microcosm-cc/bluemonday v1.0.2/go.mod h1:iVP4YcDBq+n/5fb23BhYFvIMq/leAFZyRl6bYmGDlGc=
 github.com/mitchellh/go-homedir v1.0.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=

@@ -55,6 +55,10 @@ github.com/mcluseau/go-diff v0.0.0-20190221224215-f7a208157005 h1:abOhsE6jygSMEF
 github.com/mcluseau/go-diff v0.0.0-20190221224215-f7a208157005/go.mod h1:Dh8bN8I/kRrC1IYQaBMqyC5gp3bXqXstptmgwpw+kjw=
 github.com/mcluseau/go-diff v0.0.0-20190222001419-1861e632692a h1:gmMr32eyyqR1vww03Mjd89ei7TMQfSgvfvbCMDvzRBs=
 github.com/mcluseau/go-diff v0.0.0-20190222001419-1861e632692a/go.mod h1:Dh8bN8I/kRrC1IYQaBMqyC5gp3bXqXstptmgwpw+kjw=
+github.com/mcluseau/go-diff v1.0.0 h1:LAx+Fcg4ixSgY+V0svGKP/HAkYUJwx3ATANx1FmpcSI=
+github.com/mcluseau/go-diff v1.0.0/go.mod h1:Dh8bN8I/kRrC1IYQaBMqyC5gp3bXqXstptmgwpw+kjw=
+github.com/mcluseau/go-diff v1.0.1-0.20190222001419-1861e632692a h1:QjANdZSJ6vxUev00ZR7Mfz6/OyfG7m/yeAyms1D+iOQ=
+github.com/mcluseau/go-diff v1.0.1-0.20190222001419-1861e632692a/go.mod h1:Dh8bN8I/kRrC1IYQaBMqyC5gp3bXqXstptmgwpw+kjw=
 github.com/mcluseau/kafka-sync v0.0.0-20190217062914-bf952ff087bb/go.mod h1:J8Wuc/mWmlYiCSnr5wcrA6sN+s6Le0hty1VgmXI2G/M=
 github.com/mcluseau/kafka-sync v0.0.0-20190218023944-6df3e633d270/go.mod h1:cB4W7u1RzJzPjToU5bipAEC9SsG2yIMU1zrGsWxcJY0=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
