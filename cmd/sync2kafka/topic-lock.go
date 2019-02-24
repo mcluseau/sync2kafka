@@ -1,6 +1,9 @@
 package main
 
-import "sync"
+import (
+	"runtime"
+	"sync"
+)
 
 var (
 	lockedTopics      = map[string]bool{}
@@ -24,4 +27,9 @@ func unlockTopic(topic string) {
 	defer lockedTopicsMutex.Unlock()
 
 	delete(lockedTopics, topic)
+
+	if len(lockedTopics) == 0 {
+		// no more topics sync'ing, let's GC
+		go runtime.GC()
+	}
 }
