@@ -10,7 +10,7 @@ build:
 
 helm:
     stage: helm
-    image: dkr.isi/helm/helm-runner:v0.9
+    image: dkr.isi/helm/helm-runner:v0.10
     tags:
     - ci-kubernetes
     script:
