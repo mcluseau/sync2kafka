@@ -34,8 +34,13 @@ type BinaryKV = client.BinaryKV
 func handleConn(conn net.Conn) {
 	logPrefix := fmt.Sprintf("from %v: ", conn.RemoteAddr().String())
 
+	log.Print(logPrefix, "new connection")
+	status := newConnStatus(conn)
+
 	defer func() {
+		log.Print(logPrefix, "closing connection")
 		conn.Close()
+		status.Finished()
 
 		if err := recover(); err != nil {
 			buf := make([]byte, 64*1024)
@@ -43,12 +48,6 @@ func handleConn(conn net.Conn) {
 			log.Print(logPrefix, "panic: ", err, "\n", string(buf))
 		}
 	}()
-
-	status := newConnStatus(conn)
-	defer status.Finished()
-
-	log.Print(logPrefix, "new connection")
-	defer log.Print(logPrefix, "closed connection")
 
 	enc := json.NewEncoder(conn)
 	dec := json.NewDecoder(conn)
@@ -63,11 +62,6 @@ func handleConn(conn net.Conn) {
 		log.Print(logPrefix, "authentication failed: wrong token")
 		return
 	}
-
-	kvSource := make(chan KeyValue, kvBufferSize)
-
-	cancel := make(chan bool, 1)
-	defer close(cancel)
 
 	topic := *targetTopic
 	if len(init.Topic) != 0 {
@@ -84,19 +78,25 @@ func handleConn(conn net.Conn) {
 		return
 	}
 
+	if !lockTopic(topic) {
+		log.Printf("%srejecting, topic %q already locked.", logPrefix, topic)
+		return
+	}
+	defer unlockTopic(topic)
+
+	log.Printf("%saccepting topic %q", logPrefix, init.Topic)
 	status.TargetTopic = topic
 	logPrefix += fmt.Sprintf("to topic %q: ", init.Topic)
-
-	if !lockTopic(topic) {
-		log.Print(logPrefix, "rejecting, topic already locked.")
-	}
-
-	defer unlockTopic(topic)
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 
 	var syncErr error
+
+	kvSource := make(chan KeyValue, kvBufferSize)
+
+	cancel := make(chan bool, 1)
+	defer close(cancel)
 
 	go func() {
 		defer wg.Done()
