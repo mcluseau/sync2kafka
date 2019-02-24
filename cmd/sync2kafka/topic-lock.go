@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"runtime"
 	"sync"
 )
@@ -30,6 +31,10 @@ func unlockTopic(topic string) {
 
 	if len(lockedTopics) == 0 {
 		// no more topics sync'ing, let's GC
-		go runtime.GC()
+		go func() {
+			log.Print("manual GC...")
+			runtime.GC()
+			log.Print("manual GC finished.")
+		}()
 	}
 }
