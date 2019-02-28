@@ -29,10 +29,13 @@ type Index struct {
 	db             *bolt.DB
 	bucketName     []byte
 	metaBucketName []byte
-	recordSeen     bool
-	seenBucketName []byte
-	seenStream     chan hash
-	seenWG         sync.WaitGroup
+
+	recordSeen       bool
+	seenBucketName   []byte
+	seenStream       chan hash
+	seenStreamClosed bool
+	seenStreamMutex  sync.Mutex
+	seenWG           sync.WaitGroup
 }
 
 func New(db *bolt.DB, bucket []byte, recordSeen bool) (idx *Index, err error) {
@@ -74,6 +77,8 @@ var _ diff.Index = &Index{}
 
 // Cleanup removes temp data produced by this index
 func (i *Index) Cleanup() (err error) {
+	i.closeSeenStream()
+
 	if i.seenBucketName != nil {
 		err = i.db.Update(func(tx *bolt.Tx) (err error) {
 			tx.OnCommit(func() {
@@ -216,35 +221,44 @@ func (i *Index) writeSeen() {
 	}
 }
 
+func (i *Index) closeSeenStream() {
+	i.seenStreamMutex.Lock()
+	defer i.seenStreamMutex.Unlock()
+
+	if i.seenStreamClosed {
+		return
+	}
+
+	close(i.seenStream)
+	i.seenStreamClosed = true
+}
+
 func (i *Index) KeysNotSeen() <-chan []byte {
 	if !i.recordSeen {
 		return nil
 	}
 
 	ch := make(chan []byte, 10)
-
 	go i.sendKeysNotSeen(ch)
-
 	return ch
 }
 
-func (i *Index) sendKeysNotSeen(ch chan []byte) {
+func (i *Index) sendKeysNotSeen(ch chan<- []byte) {
 	defer close(ch)
 
-	if i.seenStream != nil {
-		close(i.seenStream)
-		i.seenWG.Wait()
-	}
+	i.closeSeenStream()
+	i.seenWG.Wait()
 
 	if err := i.db.View(func(tx *bolt.Tx) (err error) {
 		keysBucket := tx.Bucket(i.bucketName)
 		seenBucket := tx.Bucket(i.seenBucketName)
 
+		if seenBucket == nil {
+			// no seenBucket => anormal condition, return immediately
+			return
+		}
+
 		err = keysBucket.ForEach(func(k, v []byte) (err error) {
-			if seenBucket == nil {
-				// no seenBucket => nothing was seen
-				ch <- k
-			}
 			if seenBucket.Get(hashOf(k).Sum(nil)) == nil {
 				ch <- k
 			}
