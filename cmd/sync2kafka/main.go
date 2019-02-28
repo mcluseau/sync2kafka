@@ -5,6 +5,10 @@ import (
 	"flag"
 	"log"
 	"net"
+	"os"
+	"os/signal"
+	"runtime"
+	"syscall"
 	"time"
 )
 
@@ -18,6 +22,8 @@ var (
 func main() {
 	flag.Set("logtostderr", "true")
 	flag.Parse()
+
+	go handleSignals()
 
 	setupStore()
 	setupKafka()
@@ -69,5 +75,23 @@ func main() {
 		}
 
 		go handleConn(conn)
+	}
+}
+
+func handleSignals() {
+	c := make(chan os.Signal, 1)
+
+	signal.Notify(c, syscall.SIGUSR1)
+
+	for sig := range c {
+		switch sig {
+		case syscall.SIGUSR1:
+			buf := make([]byte, 64*1024)
+			buf = buf[:runtime.Stack(buf, true)]
+			log.Print("got SIGUSR1, dump all stacks:\n", string(buf))
+
+		default:
+			log.Print("got unexpected signal ", sig, ", ignoring.")
+		}
 	}
 }
