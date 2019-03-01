@@ -222,6 +222,8 @@ func (i *Index) writeSeen() {
 }
 
 func (i *Index) closeSeenStream() {
+	defer i.seenWG.Wait()
+
 	i.seenStreamMutex.Lock()
 	defer i.seenStreamMutex.Unlock()
 
@@ -247,7 +249,6 @@ func (i *Index) sendKeysNotSeen(ch chan<- []byte) {
 	defer close(ch)
 
 	i.closeSeenStream()
-	i.seenWG.Wait()
 
 	if err := i.db.View(func(tx *bolt.Tx) (err error) {
 		keysBucket := tx.Bucket(i.bucketName)
