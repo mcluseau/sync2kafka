@@ -2,8 +2,6 @@ package boltindex
 
 import (
 	"bytes"
-	"fmt"
-	"sync"
 
 	"github.com/boltdb/bolt"
 	"github.com/golang/glog"
@@ -30,13 +28,7 @@ type Index struct {
 	bucketName     []byte
 	metaBucketName []byte
 
-	recordSeen       bool
-	seenBucketName   []byte
-	seenStream       chan hash
-	seenStreamClosed bool
-	seenStreamMutex  sync.Mutex
-	writeSeenStarted bool
-	seenWG           sync.WaitGroup
+	seenBatcher *batcher
 }
 
 func New(db *bolt.DB, bucket []byte, recordSeen bool) (idx *Index, err error) {
@@ -64,12 +56,17 @@ func New(db *bolt.DB, bucket []byte, recordSeen bool) (idx *Index, err error) {
 		db:             db,
 		bucketName:     bucket,
 		metaBucketName: append(metaPrefix, bucket...),
-		recordSeen:     recordSeen,
-		seenBucketName: seenBucketName,
-		seenWG:         sync.WaitGroup{},
 	}
 
-	idx.startWriteSeen()
+	if recordSeen {
+		idx.seenBatcher = newBatcher(db, seenBucketName, 100)
+		errCh := idx.seenBatcher.Start()
+		go func() {
+			if err := <-errCh; err != nil {
+				glog.Fatalf("batcher %q failed: %v", string(seenBucketName), err)
+			}
+		}()
+	}
 
 	return
 }
@@ -78,15 +75,17 @@ var _ diff.Index = &Index{}
 
 // Cleanup removes temp data produced by this index
 func (i *Index) Cleanup() (err error) {
-	i.closeSeenStream()
+	if i.seenBatcher != nil {
+		glog.V(4).Infof("clearing batcher %q", string(i.seenBatcher.BucketName))
 
-	if i.seenBucketName != nil {
+		i.seenBatcher.Close()
+		i.seenBatcher.Wait()
+
+		glog.V(4).Infof("clearing bucket %q", string(i.seenBatcher.BucketName))
 		err = i.db.Update(func(tx *bolt.Tx) (err error) {
-			tx.OnCommit(func() {
-				i.seenBucketName = nil
-			})
-			return tx.DeleteBucket(i.seenBucketName)
+			return tx.DeleteBucket(i.seenBatcher.BucketName)
 		})
+
 		if err != nil {
 			return
 		}
@@ -158,8 +157,8 @@ func (i *Index) Compare(kv KeyValue) (result diff.CompareResult, err error) {
 		return
 	}
 
-	if i.recordSeen {
-		i.seenStream <- hashOf(kv.Key)
+	if batcher := i.seenBatcher; batcher != nil {
+		batcher.Input() <- KeyValue{hashOf(kv.Key).Sum(nil), nil}
 	}
 
 	if currentValueHash == nil {
@@ -171,83 +170,12 @@ func (i *Index) Compare(kv KeyValue) (result diff.CompareResult, err error) {
 	if bytes.Equal(valueHash, currentValueHash) {
 		return diff.UnchangedKey, nil
 	}
+
 	return diff.ModifiedKey, nil
 }
 
-func (i *Index) startWriteSeen() {
-	i.seenStreamMutex.Lock()
-	defer i.seenStreamMutex.Unlock()
-
-	if i.writeSeenStarted {
-		panic("cannot call startWriteSeen twice!")
-	}
-
-	i.seenStream = make(chan hash, seenBatchSize)
-	i.seenStreamClosed = false
-	i.writeSeenStarted = true
-
-	i.seenWG.Add(1)
-	go i.writeSeen()
-}
-
-func (i *Index) writeSeen() {
-	defer i.seenWG.Done()
-
-	batch := make([]hash, 0, seenBatchSize)
-
-	saveBatch := func() (err error) {
-		glog.V(5).Infof("boltindex: seen batch: %d entries", len(batch))
-		err = i.db.Update(func(tx *bolt.Tx) (err error) {
-			bucket := tx.Bucket(i.seenBucketName)
-
-			if bucket == nil {
-				return fmt.Errorf("bucket %q has disappeared", string(i.seenBucketName))
-			}
-
-			for _, h := range batch {
-				bucket.Put(h.Sum(nil), []byte{})
-			}
-			return
-		})
-
-		if err != nil {
-			panic(err)
-		}
-
-		batch = batch[:0]
-		return
-	}
-
-	for h := range i.seenStream {
-		batch = append(batch, h)
-		if len(batch) == seenBatchSize {
-			saveBatch()
-		}
-	}
-
-	i.seenStream = nil
-
-	if len(batch) != 0 {
-		saveBatch()
-	}
-}
-
-func (i *Index) closeSeenStream() {
-	defer i.seenWG.Wait()
-
-	i.seenStreamMutex.Lock()
-	defer i.seenStreamMutex.Unlock()
-
-	if i.seenStreamClosed {
-		return
-	}
-
-	close(i.seenStream)
-	i.seenStreamClosed = true
-}
-
 func (i *Index) KeysNotSeen() <-chan []byte {
-	if !i.recordSeen {
+	if i.seenBatcher == nil {
 		return nil
 	}
 
@@ -259,11 +187,12 @@ func (i *Index) KeysNotSeen() <-chan []byte {
 func (i *Index) sendKeysNotSeen(ch chan<- []byte) {
 	defer close(ch)
 
-	i.closeSeenStream()
+	i.seenBatcher.Close()
+	i.seenBatcher.Wait()
 
 	if err := i.db.View(func(tx *bolt.Tx) (err error) {
 		keysBucket := tx.Bucket(i.bucketName)
-		seenBucket := tx.Bucket(i.seenBucketName)
+		seenBucket := tx.Bucket(i.seenBatcher.BucketName)
 
 		if seenBucket == nil {
 			// no seenBucket => anormal condition, return immediately
