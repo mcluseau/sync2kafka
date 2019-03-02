@@ -289,12 +289,12 @@ github.com/markbates/willie v1.0.9/go.mod h1:fsrFVWl91+gXpx/6dv715j7i11fYPfZ9ZGf
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-isatty v0.0.4/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
 github.com/mattn/go-sqlite3 v1.9.0/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
-github.com/mcluseau/go-diff v1.0.6-0.20190302063322-7ff75cb2e31f h1:8Ze5Rq8H8+rzkrw+H0u2UJlxSDseWZ8R0EzTC1Fp1Hk=
-github.com/mcluseau/go-diff v1.0.6-0.20190302063322-7ff75cb2e31f/go.mod h1:kTZz+P7Zr5pFlyAH7kk8XO0UHEFt1Hd09ZJHArF8CHM=
+github.com/mcluseau/go-diff v1.0.6 h1:wLq7T/N3J+LpGqBYYwxrvqKUuV2Dd+XNjcbmzByN6ME=
+github.com/mcluseau/go-diff v1.0.6/go.mod h1:kTZz+P7Zr5pFlyAH7kk8XO0UHEFt1Hd09ZJHArF8CHM=
 github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd h1:xG/m6T6l0b9UDuEiuGMHr2RyjwbQH/P6Lsk2ohQsXls=
 github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd/go.mod h1:OllM1HVcFzek2effrrgC8BLKfG73mSKfrh41kEuhvMk=
-github.com/mcluseau/kafka-sync v1.0.6-0.20190302063350-3ca8e3ea054e h1:3YdWLF/J2pCY056LJzVOZcOpw625Lp1XTehgr/YtKAM=
-github.com/mcluseau/kafka-sync v1.0.6-0.20190302063350-3ca8e3ea054e/go.mod h1:WBnc29xLrwtGhSRVj3uf91VZxp1dp9+mLrHDU4eV6cs=
+github.com/mcluseau/kafka-sync v1.0.6 h1:wiqCbVPJzupYFulCP4/QyFqVrEsXfxryuEA+f0VyCyk=
+github.com/mcluseau/kafka-sync v1.0.6/go.mod h1:OYgmIa5nKKMXwg9Qk2EdEGxSzjTFfhyZLqWnX3XHX1s=
 github.com/microcosm-cc/bluemonday v1.0.1/go.mod h1:hsXNsILzKxV+sX77C5b8FSuKF00vh2OMYv+xgHpAMF4=
 github.com/microcosm-cc/bluemonday v1.0.2/go.mod h1:iVP4YcDBq+n/5fb23BhYFvIMq/leAFZyRl6bYmGDlGc=
 github.com/mitchellh/go-homedir v1.0.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=

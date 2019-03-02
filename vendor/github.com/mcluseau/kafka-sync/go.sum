@@ -15,8 +15,8 @@ github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfU
 github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/golang/snappy v0.0.1 h1:Qgr9rKW7uDUkrbSmQeiDsGa8SjGyCOGtuasMWwvp2P4=
 github.com/golang/snappy v0.0.1/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
-github.com/mcluseau/go-diff v1.0.6-0.20190302063322-7ff75cb2e31f h1:8Ze5Rq8H8+rzkrw+H0u2UJlxSDseWZ8R0EzTC1Fp1Hk=
-github.com/mcluseau/go-diff v1.0.6-0.20190302063322-7ff75cb2e31f/go.mod h1:kTZz+P7Zr5pFlyAH7kk8XO0UHEFt1Hd09ZJHArF8CHM=
+github.com/mcluseau/go-diff v1.0.6 h1:wLq7T/N3J+LpGqBYYwxrvqKUuV2Dd+XNjcbmzByN6ME=
+github.com/mcluseau/go-diff v1.0.6/go.mod h1:kTZz+P7Zr5pFlyAH7kk8XO0UHEFt1Hd09ZJHArF8CHM=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/pierrec/lz4 v2.0.5+incompatible h1:2xWsjqPFWcplujydGg4WmhC/6fZqK42wMM8aXeqhl0I=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
