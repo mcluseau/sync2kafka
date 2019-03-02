@@ -35,6 +35,7 @@ type Index struct {
 	seenStream       chan hash
 	seenStreamClosed bool
 	seenStreamMutex  sync.Mutex
+	writeSeenStarted bool
 	seenWG           sync.WaitGroup
 }
 
@@ -174,7 +175,17 @@ func (i *Index) Compare(kv KeyValue) (result diff.CompareResult, err error) {
 }
 
 func (i *Index) startWriteSeen() {
+	i.seenStreamMutex.Lock()
+	defer i.seenStreamMutex.Unlock()
+
+	if i.writeSeenStarted {
+		panic("cannot call startWriteSeen twice!")
+	}
+
 	i.seenStream = make(chan hash, seenBatchSize)
+	i.seenStreamClosed = false
+	i.writeSeenStarted = true
+
 	i.seenWG.Add(1)
 	go i.writeSeen()
 }
