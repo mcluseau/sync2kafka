@@ -37,6 +37,7 @@ func (spec *syncSpec) sync() (stats *SyncStats, err error) {
 		if err := index.Cleanup(); err != nil {
 			log.Print("WARN: index cleanup failed: ", err)
 		}
+		log.Print("index cleaned-up")
 	}()
 
 	stats, err = syncer.SyncWithIndex(kafka, spec.Source, index, spec.Cancel)
