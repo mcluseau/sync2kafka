@@ -31,7 +31,9 @@ func (spec *syncSpec) sync() (stats *SyncStats, err error) {
 		return
 	}
 
+	log.Print("index created")
 	defer func() {
+		log.Print("index cleanup")
 		if err := index.Cleanup(); err != nil {
 			log.Print("WARN: index cleanup failed: ", err)
 		}
