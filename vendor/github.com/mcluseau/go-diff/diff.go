@@ -90,7 +90,7 @@ l:
 			}
 		}
 
-		glog.V(5).Info("DiffStreamIndex: new value")
+		glog.V(10).Info("DiffStreamIndex: new value")
 		cmp, err := currentIndex.Compare(kv)
 		if err != nil {
 			panic(err)

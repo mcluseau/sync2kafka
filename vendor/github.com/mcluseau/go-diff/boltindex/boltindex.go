@@ -83,7 +83,11 @@ func (i *Index) Cleanup() (err error) {
 
 		glog.V(4).Infof("clearing bucket %q", string(i.seenBatcher.BucketName))
 		err = i.db.Update(func(tx *bolt.Tx) (err error) {
-			return tx.DeleteBucket(i.seenBatcher.BucketName)
+			err = tx.DeleteBucket(i.seenBatcher.BucketName)
+			if err == bolt.ErrBucketNotFound {
+				err = nil
+			}
+			return
 		})
 
 		if err != nil {
