@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------
-from golang:1.11.5-alpine3.8 as build
+from dkr.isi/builders/golang:1.12.0-3 as build
 run apk add --update musl-dev gcc
 
 env p isi.nc/common/sync2kafka
