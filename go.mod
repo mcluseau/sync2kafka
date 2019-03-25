@@ -13,15 +13,13 @@ require (
 	github.com/gobuffalo/envy v1.6.15 // indirect
 	github.com/json-iterator/go v1.1.5 // indirect
 	github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f // indirect
-	github.com/mcluseau/go-diff v1.0.7
+	github.com/mcluseau/go-diff v1.0.8
 	github.com/mcluseau/go-swagger-ui v0.0.0-20190204031917-596bc3a55ffd
-	github.com/mcluseau/kafka-sync v1.0.7
+	github.com/mcluseau/kafka-sync v1.0.8
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/oklog/ulid v1.3.1
 	github.com/rogpeppe/go-internal v1.2.2 // indirect
-	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	golang.org/x/net v0.0.0-20190213061140-3a22650c66bd // indirect
-	golang.org/x/sys v0.0.0-20190312061237-fead79001313 // indirect
 	golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2 // indirect
 )
