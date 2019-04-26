@@ -18,7 +18,7 @@ httpToken: dav9ao8chahKeshi
 tlsSecret: ""
 
 store:
-    storageClass: "default"
+    storageClass: ""
     accessMode: ReadWriteOnce
     capacity: 10Gi
 
