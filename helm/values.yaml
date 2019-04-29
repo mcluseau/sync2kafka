@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: dkr.isi/$DOCKER_NAME
+  repository: $DOCKER_IMAGE_PREFIX/$DOCKER_NAME
   tag: "$DOCKER_TAG"
   pullPolicy: IfNotPresent
 
