@@ -14,5 +14,7 @@ spec:
   resources:
     requests:
       storage: {{ .Values.store.capacity }}
+  {{- if .Values.store.storageClass }}
   storageClassName: {{ .Values.store.storageClass |quote }}
+  {{- end }}
 {{- end }}
