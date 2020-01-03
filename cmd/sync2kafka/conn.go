@@ -13,7 +13,7 @@ import (
 
 	kafkasync "github.com/mcluseau/kafka-sync"
 
-	"isi.nc/common/sync2kafka/client"
+	"github.com/antonin07130/sync2kafka/client"
 )
 
 const kvBufferSize = 1000
@@ -116,6 +116,7 @@ func handleConn(conn net.Conn) {
 		err = readJsonKVs(dec, kvSource, status)
 
 	case "binary":
+		log.Println("read binary")
 		err = readBinaryKVs(dec, kvSource, status)
 
 	default:
