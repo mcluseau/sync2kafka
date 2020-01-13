@@ -16,7 +16,7 @@ import (
 
 	//"os"
 
-	"github.com/antonin07130/sync2kafka/client"
+	"github.com/mcluseau/sync2kafka/client"
 )
 
 var (
